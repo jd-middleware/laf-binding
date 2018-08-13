@@ -6,7 +6,7 @@
 
     <groupId>com.jd.laf.binding</groupId>
     <artifactId>laf-binding</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <organization>
         <name>JD.com, Inc.</name>
@@ -17,7 +17,6 @@
         <jdk.version>1.6</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <laf-extension.version>1.0.0-SNAPSHOT</laf-extension.version>
     </properties>
 
     <dependencies>
