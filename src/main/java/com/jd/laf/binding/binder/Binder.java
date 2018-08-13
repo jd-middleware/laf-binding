@@ -76,10 +76,11 @@ public interface Binder {
          * 设置值
          *
          * @param value
+         * @return
          * @throws ReflectionException
          */
-        public void bind(final Object value) throws ReflectionException {
-            Reflect.set(target, field, value, factory);
+        public boolean bind(final Object value) throws ReflectionException {
+            return Reflect.set(target, field, value, factory);
         }
     }
 }
