@@ -1,6 +1,7 @@
 package com.jd.laf.binding.binder;
 
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
+import com.jd.laf.binding.reflect.Reflect;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.annotation.Annotation;
@@ -69,6 +70,16 @@ public interface Binder {
 
         public Object getSource() {
             return source;
+        }
+
+        /**
+         * 设置值
+         *
+         * @param value
+         * @throws ReflectionException
+         */
+        public void bind(final Object value) throws ReflectionException {
+            Reflect.set(target, field, value, factory);
         }
     }
 }
