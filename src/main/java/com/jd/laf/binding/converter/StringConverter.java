@@ -19,7 +19,7 @@ public class StringConverter implements Converter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{String.class};
+    public Class<?> type() {
+        return String.class;
     }
 }

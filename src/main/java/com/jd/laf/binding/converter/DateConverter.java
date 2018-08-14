@@ -67,7 +67,7 @@ public class DateConverter implements Converter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{Date.class};
+    public Class<?> type() {
+        return Date.class;
     }
 }

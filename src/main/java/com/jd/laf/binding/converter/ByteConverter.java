@@ -21,7 +21,7 @@ public class ByteConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{byte.class, Byte.class};
+    public Class<?> type() {
+        return Byte.class;
     }
 }

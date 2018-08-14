@@ -21,7 +21,7 @@ public class DoubleConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{double.class, Double.class};
+    public Class<?> type() {
+        return Double.class;
     }
 }

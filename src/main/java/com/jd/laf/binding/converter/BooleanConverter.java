@@ -30,7 +30,7 @@ public class BooleanConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{boolean.class, Boolean.class};
+    public Class<?> type() {
+        return Boolean.class;
     }
 }

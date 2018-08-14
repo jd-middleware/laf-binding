@@ -27,7 +27,7 @@ public class CharConverter implements Converter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{char.class, Character.class};
+    public Class<?> type() {
+        return Character.class;
     }
 }

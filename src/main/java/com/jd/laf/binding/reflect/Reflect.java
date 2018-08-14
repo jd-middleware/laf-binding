@@ -1,14 +1,16 @@
 package com.jd.laf.binding.reflect;
 
 import com.jd.laf.binding.Option;
-import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.jd.laf.binding.converter.Converters.getConverter;
+import static com.jd.laf.binding.converter.Converters.getOperation;
+import static com.jd.laf.binding.reflect.Primitive.inbox;
 import static com.jd.laf.binding.reflect.PropertyGetters.getPropertyGetter;
 
 /**
@@ -17,8 +19,8 @@ import static com.jd.laf.binding.reflect.PropertyGetters.getPropertyGetter;
 public abstract class Reflect {
 
     //类的字段名和字段映射
-    protected static ConcurrentMap<Class<?>, ConcurrentMap<String, Option<Field>>> fields = new ConcurrentHashMap<Class<?>,
-            ConcurrentMap<String, Option<Field>>>();
+    protected static ConcurrentMap<Class<?>, ConcurrentMap<String, Option<Field>>> fields =
+            new ConcurrentHashMap<Class<?>, ConcurrentMap<String, Option<Field>>>();
 
     /**
      * 获取类的字段
@@ -29,7 +31,7 @@ public abstract class Reflect {
      * @throws ReflectionException
      */
     public static Field getField(final Class<?> clazz, final String name) throws ReflectionException {
-        if (clazz == null || name == null || name.isEmpty()) {
+        if (clazz == null || clazz.isPrimitive() || name == null || name.isEmpty()) {
             return null;
         }
         ConcurrentMap<String, Option<Field>> options = fields.get(clazz);
@@ -43,17 +45,22 @@ public abstract class Reflect {
         Option<Field> option = options.get(name);
         if (option == null) {
             Field field = null;
-            try {
-                field = clazz.getDeclaredField(name);
-            } catch (NoSuchFieldException e) {
-            } catch (SecurityException e) {
-                throw new ReflectionException(e.getMessage(), e);
+            SuperClassIterator iterator = new SuperClassIterator(clazz);
+            while (iterator.hasNext()) {
+                try {
+                    field = iterator.next().getDeclaredField(name);
+                    break;
+                } catch (NoSuchFieldException e) {
+                } catch (SecurityException e) {
+                    throw new ReflectionException(e.getMessage(), e);
+                }
             }
             option = new Option<Field>(field);
             Option<Field> exist = options.putIfAbsent(name, option);
             if (exist != null) {
                 option = exist;
             }
+
         }
         return option.get();
     }
@@ -195,55 +202,28 @@ public abstract class Reflect {
             return true;
         }
         Object v = value;
-        Class<?> fieldClass = getClass(field.getType());
-        Class<?> valueClass = getClass(v.getClass());
-        if (fieldClass == valueClass || fieldClass.isAssignableFrom(valueClass)) {
+        Class<?> targetType = inbox(field.getType());
+        Class<?> sourceType = inbox(v.getClass());
+        if (targetType == sourceType || targetType.isAssignableFrom(sourceType)) {
             //可以直接赋值，进行校验
             accessor.set(target, v);
             return true;
         } else {
-            //判断是否有转化器
-            Converter converter = getConverter(valueClass, fieldClass);
-            if (converter != null) {
-                v = converter.convert(new Converter.Conversion(value, fieldClass, format));
-                if (v != null) {
-                    //校验
-                    accessor.set(target, v);
-                    return true;
+            ConverterSupplier.Operation operation = getOperation(sourceType, targetType);
+            if (operation != null) {
+                try {
+                    v = operation.execute(new Conversion(sourceType, targetType, v, format));
+                    if (v != null) {
+                        accessor.set(target, v);
+                    }
+                } catch (ReflectionException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new ReflectionException(e.getMessage(), e);
                 }
             }
         }
         return false;
-    }
-
-    /**
-     * 处理基本类型
-     *
-     * @param clazz
-     * @return
-     */
-    protected static Class<?> getClass(final Class<?> clazz) {
-        if (!clazz.isPrimitive()) {
-            return clazz;
-        } else if (int.class.equals(clazz)) {
-            return Integer.class;
-        } else if (double.class.equals(clazz)) {
-            return Double.class;
-        } else if (char.class.equals(clazz)) {
-            return Character.class;
-        } else if (boolean.class.equals(clazz)) {
-            return Boolean.class;
-        } else if (long.class.equals(clazz)) {
-            return Long.class;
-        } else if (float.class.equals(clazz)) {
-            return Float.class;
-        } else if (short.class.equals(clazz)) {
-            return Short.class;
-        } else if (byte.class.equals(clazz)) {
-            return Byte.class;
-        } else {
-            return clazz;
-        }
     }
 
 }

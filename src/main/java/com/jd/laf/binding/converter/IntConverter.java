@@ -21,7 +21,7 @@ public class IntConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{int.class, Integer.class};
+    public Class<?> type() {
+        return Integer.class;
     }
 }

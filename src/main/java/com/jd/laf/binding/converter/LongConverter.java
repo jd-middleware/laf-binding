@@ -21,7 +21,7 @@ public class LongConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{long.class, Long.class};
+    public Class<?> type() {
+        return Long.class;
     }
 }

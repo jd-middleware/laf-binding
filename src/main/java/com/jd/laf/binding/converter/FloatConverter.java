@@ -21,7 +21,7 @@ public class FloatConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{float.class, Float.class};
+    public Class<?> type() {
+        return Float.class;
     }
 }

@@ -21,7 +21,7 @@ public class ShortConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?>[] types() {
-        return new Class[]{short.class, Short.class};
+    public Class<?> type() {
+        return Short.class;
     }
 }

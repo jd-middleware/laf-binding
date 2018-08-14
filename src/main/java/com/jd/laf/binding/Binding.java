@@ -3,10 +3,7 @@ package com.jd.laf.binding;
 
 import com.jd.laf.binding.binder.Binder;
 import com.jd.laf.binding.binder.Binder.Context;
-import com.jd.laf.binding.reflect.FieldAccessor;
-import com.jd.laf.binding.reflect.FieldAccessorFactory;
-import com.jd.laf.binding.reflect.Reflect;
-import com.jd.laf.binding.reflect.ReflectAccessorFactory;
+import com.jd.laf.binding.reflect.*;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.annotation.Annotation;
@@ -119,8 +116,9 @@ public class Binding {
             Annotation[] annotations;
             BindingField bindingField;
             Binder binder;
-            // 递归查找
-            while (clazz != null && clazz != Object.class) {
+            SuperClassIterator iterator = new SuperClassIterator(clazz);
+            while (iterator.hasNext()) {
+                clazz = iterator.next();
                 //所有声明的字段
                 fields = clazz.getDeclaredFields();
                 //遍历字段
@@ -143,7 +141,6 @@ public class Binding {
                         bindings.add(bindingField);
                     }
                 }
-                clazz = clazz.getSuperclass();
             }
             List<BindingField> exists = bindingFields.putIfAbsent(clazz, bindings);
             if (exists != null) {
