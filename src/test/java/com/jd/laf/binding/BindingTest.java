@@ -5,9 +5,7 @@ import com.jd.laf.binding.reflect.exception.ReflectionException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BindingTest {
 
@@ -23,6 +21,7 @@ public class BindingTest {
         context.put("birthDay", "1970-01-01");
         context.put("company", new Company("testss"));
         context.put("sex", "MALE");
+        context.put("ids", Arrays.asList("1", "2", "3"));
         Employee employee = new Employee();
         Binding.bind(context, employee);
         Assert.assertEquals(employee.name, "name");
@@ -34,6 +33,7 @@ public class BindingTest {
         Assert.assertNotNull(employee.birthDay);
         Assert.assertEquals(employee.company, "testss");
         Assert.assertEquals(employee.sex, Sex.MALE);
+        Assert.assertEquals(employee.getIds().size(), 3);
 
         Binding.set(employee, "age", "68");
         Assert.assertEquals(employee.getAge(), 68);
@@ -74,6 +74,8 @@ public class BindingTest {
         private String company;
         @Value
         private Sex sex;
+        @Value
+        private Set<String> ids;
 
         public String getName() {
             return name;
@@ -145,6 +147,14 @@ public class BindingTest {
 
         public void setSex(Sex sex) {
             this.sex = sex;
+        }
+
+        public Set<String> getIds() {
+            return ids;
+        }
+
+        public void setIds(Set<String> ids) {
+            this.ids = ids;
         }
     }
 
