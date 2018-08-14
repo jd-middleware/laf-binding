@@ -22,6 +22,7 @@ public class BindingTest {
         context.put("height1", 500);
         context.put("birthDay", "1970-01-01");
         context.put("company", new Company("testss"));
+        context.put("sex", "MALE");
         Employee employee = new Employee();
         Binding.bind(context, employee);
         Assert.assertEquals(employee.name, "name");
@@ -32,6 +33,7 @@ public class BindingTest {
         Assert.assertEquals(employee.height, 500);
         Assert.assertNotNull(employee.birthDay);
         Assert.assertEquals(employee.company, "testss");
+        Assert.assertEquals(employee.sex, Sex.MALE);
 
         Binding.set(employee, "age", "68");
         Assert.assertEquals(employee.getAge(), 68);
@@ -70,6 +72,8 @@ public class BindingTest {
         private Date birthDay;
         @Value("company.name")
         private String company;
+        @Value
+        private Sex sex;
 
         public String getName() {
             return name;
@@ -134,5 +138,18 @@ public class BindingTest {
         public void setCompany(String company) {
             this.company = company;
         }
+
+        public Sex getSex() {
+            return sex;
+        }
+
+        public void setSex(Sex sex) {
+            this.sex = sex;
+        }
+    }
+
+    public enum Sex {
+        MALE,
+        FEMALE
     }
 }

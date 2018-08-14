@@ -12,15 +12,11 @@ import static com.jd.laf.binding.reflect.Primitive.inbox;
 /**
  * 根据静态工厂方法进行转换
  */
-public abstract class MethodSupplier implements ConverterSupplier {
-
-    //单参数构造函数映射
-    protected static ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Method>>> methods =
-            new ConcurrentHashMap<Class<?>, ConcurrentMap<Class<?>, Option<Method>>>();
+public abstract class StaticMethodSupplier implements ConverterSupplier {
 
     protected final String methodName;
 
-    public MethodSupplier(String methodName) {
+    public StaticMethodSupplier(String methodName) {
         if (methodName == null || methodName.isEmpty()) {
             throw new IllegalArgumentException("methodName can not be empty.");
         }
@@ -38,9 +34,11 @@ public abstract class MethodSupplier implements ConverterSupplier {
             return null;
         }
         // 判断是否有构造函数
-        Method method = getMethod(targetType, sourceType, methodName);
+        Method method = getMethod(targetType, sourceType, methodName, getCache());
         return method == null ? null : new MethodOperation(method);
     }
+
+    protected abstract ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Method>>> getCache();
 
     /**
      * 获取工厂方法
@@ -48,17 +46,19 @@ public abstract class MethodSupplier implements ConverterSupplier {
      * @param targetType    目标类型
      * @param parameterType 参数类型
      * @param methodName    方法名称
+     * @param cache         方法缓存
      * @return 方法
      * @throws SecurityException
      */
-    protected static Method getMethod(final Class<?> targetType, final Class<?> parameterType, final String methodName) throws SecurityException {
+    protected static Method getMethod(final Class<?> targetType, final Class<?> parameterType, final String methodName,
+                                      ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Method>>> cache) throws SecurityException {
         if (targetType == null || targetType.isInterface() || parameterType == null) {
             return null;
         }
-        ConcurrentMap<Class<?>, Option<Method>> options = methods.get(targetType);
+        ConcurrentMap<Class<?>, Option<Method>> options = cache.get(targetType);
         if (options == null) {
             options = new ConcurrentHashMap<Class<?>, Option<Method>>();
-            ConcurrentMap<Class<?>, Option<Method>> exist = methods.putIfAbsent(targetType, options);
+            ConcurrentMap<Class<?>, Option<Method>> exist = cache.putIfAbsent(targetType, options);
             if (exist != null) {
                 options = exist;
             }
@@ -107,7 +107,7 @@ public abstract class MethodSupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            return conversion == null ? null : method.invoke(conversion.source);
+            return conversion == null ? null : method.invoke(null, conversion.source);
         }
     }
 
