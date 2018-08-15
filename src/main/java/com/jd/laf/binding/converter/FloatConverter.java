@@ -13,7 +13,7 @@ public class FloatConverter extends NumberConverter {
             return ((Number) conversion.source).floatValue();
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return Float.parseFloat((conversion.source.toString()));
+                return Float.parseFloat((conversion.source.toString().trim()));
             } catch (NumberFormatException e) {
             }
         }

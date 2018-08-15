@@ -13,7 +13,7 @@ public class IntConverter extends NumberConverter {
             return ((Number) conversion.source).intValue();
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return Integer.parseInt((conversion.source.toString()));
+                return Integer.parseInt((conversion.source.toString().trim()));
             } catch (NumberFormatException e) {
             }
         }

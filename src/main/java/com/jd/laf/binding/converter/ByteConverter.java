@@ -13,7 +13,7 @@ public class ByteConverter extends NumberConverter {
             return ((Number) conversion.source).byteValue();
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return Byte.parseByte((conversion.source.toString()));
+                return Byte.parseByte((conversion.source.toString().trim()));
             } catch (NumberFormatException e) {
             }
         }

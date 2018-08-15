@@ -22,6 +22,7 @@ public class BindingTest {
         context.put("company", new Company("testss"));
         context.put("sex", "MALE");
         context.put("ids", Arrays.asList("1", "2", "3"));
+        context.put("myIds", "1,2,3");
         Employee employee = new Employee();
         Binding.bind(context, employee);
         Assert.assertEquals(employee.name, "name");
@@ -34,6 +35,9 @@ public class BindingTest {
         Assert.assertEquals(employee.company, "testss");
         Assert.assertEquals(employee.sex, Sex.MALE);
         Assert.assertEquals(employee.getIds().size(), 3);
+        Assert.assertEquals(employee.getIntIds().length, 3);
+        Assert.assertEquals(employee.getMyIds().length, 3);
+        Assert.assertEquals(employee.getIdSet().size(), 3);
 
         Binding.set(employee, "age", "68");
         Assert.assertEquals(employee.getAge(), 68);
@@ -75,7 +79,13 @@ public class BindingTest {
         @Value
         private Sex sex;
         @Value
-        private Set<String> ids;
+        private Set<Integer> ids;
+        @Value("ids")
+        private int[] intIds;
+        @Value(format = ",")
+        private int[] myIds;
+        @Value(value = "myIds",format = ",")
+        private SortedSet<Integer> idSet;
 
         public String getName() {
             return name;
@@ -149,12 +159,36 @@ public class BindingTest {
             this.sex = sex;
         }
 
-        public Set<String> getIds() {
+        public Set<Integer> getIds() {
             return ids;
         }
 
-        public void setIds(Set<String> ids) {
+        public void setIds(Set<Integer> ids) {
             this.ids = ids;
+        }
+
+        public int[] getIntIds() {
+            return intIds;
+        }
+
+        public void setIntIds(int[] intIds) {
+            this.intIds = intIds;
+        }
+
+        public int[] getMyIds() {
+            return myIds;
+        }
+
+        public void setMyIds(int[] myIds) {
+            this.myIds = myIds;
+        }
+
+        public SortedSet<Integer> getIdSet() {
+            return idSet;
+        }
+
+        public void setIdSet(SortedSet<Integer> idSet) {
+            this.idSet = idSet;
         }
     }
 

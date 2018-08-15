@@ -23,7 +23,7 @@ public class DateConverter implements Converter {
         } else if (conversion.source instanceof Number) {
             return new Date(((Number) conversion.source).longValue());
         } else if (conversion.source instanceof CharSequence) {
-            String source = ((CharSequence) conversion.source).toString();
+            String source = ((CharSequence) conversion.source).toString().trim();
             String format = conversion.format == null ? null : conversion.format.toString();
             if (format == null || format.isEmpty()) {
                 switch (source.length()) {

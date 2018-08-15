@@ -13,7 +13,7 @@ public class ShortConverter extends NumberConverter {
             return ((Number) conversion.source).shortValue();
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return Short.parseShort((conversion.source.toString()));
+                return Short.parseShort((conversion.source.toString().trim()));
             } catch (NumberFormatException e) {
             }
         }

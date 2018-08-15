@@ -11,7 +11,7 @@ public class CharConverter implements Converter {
             return null;
         }
         if (conversion.source instanceof CharSequence) {
-            return conversion.source.toString().charAt(0);
+            return conversion.source.toString().trim().charAt(0);
         }
         return null;
     }

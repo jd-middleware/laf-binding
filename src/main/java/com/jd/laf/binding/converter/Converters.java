@@ -14,10 +14,17 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class Converters {
 
-    // 转换器
+    //转换器
     protected static volatile List<ConverterSupplier> plugins;
-    protected static ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Operation>>> operations =
+    protected static final ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Operation>>> operations =
             new ConcurrentHashMap<Class<?>, ConcurrentMap<Class<?>, Option<Operation>>>();
+    //不做转换
+    protected static final Operation NONE = new Operation() {
+        @Override
+        public Object execute(Conversion conversion) throws Exception {
+            return conversion.source;
+        }
+    };
 
     /**
      * 获取转换操作
@@ -29,9 +36,11 @@ public abstract class Converters {
     public static Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
         if (sourceType == null || targetType == null) {
             return null;
-        }
-        //加载插件
-        if (plugins == null) {
+        } else if (targetType == sourceType || targetType.isAssignableFrom(sourceType)) {
+            //可以直接赋值
+            return NONE;
+        } else if (plugins == null) {
+            //加载插件
             synchronized (Converters.class) {
                 if (plugins == null) {
                     List<ConverterSupplier> suppliers = new ArrayList<ConverterSupplier>();

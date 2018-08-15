@@ -14,7 +14,7 @@ public class BooleanConverter extends NumberConverter {
         } else if (conversion.source instanceof Character) {
             return ((Character) conversion.source) != '0' ? Boolean.TRUE : Boolean.FALSE;
         } else if (conversion.source instanceof CharSequence) {
-            String value = conversion.source.toString();
+            String value = conversion.source.toString().trim();
             if ("true".equalsIgnoreCase(value)) {
                 return true;
             } else if ("false".equalsIgnoreCase(value)) {

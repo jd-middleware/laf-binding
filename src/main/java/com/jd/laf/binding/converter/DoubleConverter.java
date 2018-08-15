@@ -13,7 +13,7 @@ public class DoubleConverter extends NumberConverter {
             return ((Number) conversion.source).doubleValue();
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return Double.parseDouble((conversion.source.toString()));
+                return Double.parseDouble((conversion.source.toString().trim()));
             } catch (NumberFormatException e) {
             }
         }

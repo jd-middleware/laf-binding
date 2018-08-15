@@ -13,7 +13,7 @@ public class LongConverter extends NumberConverter {
             return ((Number) conversion.source).longValue();
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return Long.parseLong((conversion.source.toString()));
+                return Long.parseLong((conversion.source.toString().trim()));
             } catch (NumberFormatException e) {
             }
         }
