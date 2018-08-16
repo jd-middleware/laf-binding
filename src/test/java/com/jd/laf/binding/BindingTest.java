@@ -117,7 +117,7 @@ public class BindingTest {
         private int[] intIds;
         @Value(format = ",")
         private int[] myIds;
-        @Value(value = "myIds", format = ",")
+        @Value(value = "myIds")
         private SortedSet<Integer> idSet;
 
         public String getName() {

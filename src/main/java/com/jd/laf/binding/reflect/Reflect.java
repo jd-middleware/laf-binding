@@ -546,7 +546,7 @@ public abstract class Reflect {
     protected static List<String> split(final String value, final String delimiter) {
         List<String> result = new LinkedList<String>();
         if (delimiter == null || delimiter.isEmpty()) {
-            return result;
+            return split(value, ',');
         } else if (delimiter.length() == 1) {
             return split(value, delimiter.charAt(0));
         }
