@@ -2,6 +2,7 @@ package com.jd.laf.binding.reflect;
 
 import com.jd.laf.binding.Option;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class PropertyGetters {
 
+    public static final String GET_OBJECT = "getObject";
     //属性获取器插件
     protected static volatile List<PropertyGetter> plugins;
     //类对应的属性获取器
@@ -55,6 +57,16 @@ public abstract class PropertyGetters {
                     break;
                 }
             }
+            if (getter == null) {
+                //查找方法Object get(String name)
+                try {
+                    Method method = clazz.getMethod(GET_OBJECT, String.class);
+                    if (method != null) {
+                        getter = new MethodGetter(method);
+                    }
+                } catch (Exception e) {
+                }
+            }
             option = new Option<PropertyGetter>(getter);
             Option<PropertyGetter> exists = getters.putIfAbsent(clazz, option);
             if (exists != null) {
@@ -62,6 +74,28 @@ public abstract class PropertyGetters {
             }
         }
         return option.get();
+    }
+
+    /**
+     * 根据反射方法来调用
+     */
+    protected static class MethodGetter implements PropertyGetter {
+
+        protected Method method;
+
+        public MethodGetter(Method method) {
+            this.method = method;
+        }
+
+        @Override
+        public Object get(final Object target, final String name) throws Exception {
+            return method.invoke(target, name);
+        }
+
+        @Override
+        public boolean support(Class<?> clazz) {
+            return true;
+        }
     }
 
 }

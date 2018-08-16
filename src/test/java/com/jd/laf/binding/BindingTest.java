@@ -10,21 +10,10 @@ import java.util.*;
 public class BindingTest {
 
     @Test
-    public void testBinding() throws ReflectionException {
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put("name", "name");
-        context.put("age", 27);
-        context.put("salary", 10000.00);
-        context.put("weight", 63.5);
-        context.put("married", "true");
-        context.put("height1", 500);
-        context.put("birthDay", "1970-01-01");
-        context.put("company", new Company("testss"));
-        context.put("sex", "MALE");
-        context.put("ids", Arrays.asList("1", "2", "3"));
-        context.put("myIds", "1,2,3");
+    public void testMapBinding() throws ReflectionException {
+        Map<String, Object> context = createContext();
         Employee employee = new Employee();
-        Binding.bind(context, employee);
+        bind(employee, context);
         Assert.assertEquals(employee.name, "name");
         Assert.assertEquals(employee.age, 27);
         Assert.assertEquals(employee.salary, 10000.00, 0);
@@ -38,9 +27,53 @@ public class BindingTest {
         Assert.assertEquals(employee.getIntIds().length, 3);
         Assert.assertEquals(employee.getMyIds().length, 3);
         Assert.assertEquals(employee.getIdSet().size(), 3);
+    }
 
+    protected void bind(final Employee employee, final Map<String, Object> context) throws ReflectionException {
+        Binding.bind(context, employee);
+    }
+
+    protected Map<String, Object> createContext() {
+        Map<String, Object> context = new HashMap<String, Object>();
+        context.put("name", "name");
+        context.put("age", 27);
+        context.put("salary", 10000.00);
+        context.put("weight", 63.5);
+        context.put("married", "true");
+        context.put("height1", 500);
+        context.put("birthDay", "1970-01-01");
+        context.put("company", new Company("testss"));
+        context.put("sex", "MALE");
+        context.put("ids", Arrays.asList("1", "2", "3"));
+        context.put("myIds", "1,2,3");
+        return context;
+    }
+
+    @Test
+    public void testSetField() throws ReflectionException {
+        Employee employee = new Employee();
         Binding.set(employee, "age", "68");
         Assert.assertEquals(employee.getAge(), 68);
+    }
+
+    @Test
+    public void testMethodBinding() throws ReflectionException {
+        Employee employee = new Employee();
+        Binding.bind(new Context(), employee);
+        Assert.assertEquals(employee.age, 10);
+    }
+
+    @Test
+    public void testBindPerformance() throws ReflectionException {
+        Map<String, Object> context = createContext();
+        Employee employee = new Employee();
+        long time = System.currentTimeMillis();
+        int count = 1000000000;
+        for (int i = 0; i < count; i++) {
+            bind(employee, context);
+        }
+        time = System.currentTimeMillis() - time;
+        System.out.println(count * 1000 / time);
     }
 
     public static class Company {
@@ -84,7 +117,7 @@ public class BindingTest {
         private int[] intIds;
         @Value(format = ",")
         private int[] myIds;
-        @Value(value = "myIds",format = ",")
+        @Value(value = "myIds", format = ",")
         private SortedSet<Integer> idSet;
 
         public String getName() {
@@ -195,5 +228,16 @@ public class BindingTest {
     public enum Sex {
         MALE,
         FEMALE
+    }
+
+    public static class Context {
+
+        public Object getObject(String name) {
+            if ("age".equals(name)) {
+                return 10;
+            }
+            return null;
+        }
+
     }
 }

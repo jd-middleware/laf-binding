@@ -128,14 +128,20 @@ public abstract class Reflect {
             return null;
         }
         PropertyGetter getter = getPropertyGetter(target.getClass());
-        Object result = getter == null ? null : getter.get(target, name);
-        if (result == null && Character.isJavaIdentifierStart(name.charAt(0))) {
-            Field field = getField(target.getClass(), name);
-            if (field != null) {
-                return factory.getAccessor(field).get(target);
+        try {
+            Object result = getter == null ? null : getter.get(target, name);
+            if (result == null && Character.isJavaIdentifierStart(name.charAt(0))) {
+                Field field = getField(target.getClass(), name);
+                if (field != null) {
+                    return factory.getAccessor(field).get(target);
+                }
             }
+            return result;
+        } catch (ReflectionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ReflectionException(e.getMessage(), e);
         }
-        return result;
     }
 
 
