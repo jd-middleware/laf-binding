@@ -95,9 +95,9 @@ public class CustomSupplier implements ConverterSupplier {
     }
 
     /**
-     * 构造函数操作
+     * 自定义转换器转换操作
      */
-    protected static final class CustomOperation implements Operation {
+    public static final class CustomOperation implements Operation {
 
         protected final Converter converter;
 
