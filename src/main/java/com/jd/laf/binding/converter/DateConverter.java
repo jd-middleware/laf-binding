@@ -1,9 +1,12 @@
 package com.jd.laf.binding.converter;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 时间转换器
@@ -13,6 +16,34 @@ public class DateConverter implements Converter {
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static final String YYYY_MM_DD = "yyyy-MM-dd";
     public static final String HH_MM_SS = "HH:mm:ss";
+
+    //DateFormat不是线程安全的
+    protected static ThreadLocal<Map<String, DateFormat>> threadLocal = new ThreadLocal<Map<String, DateFormat>>() {
+        @Override
+        protected Map<String, DateFormat> initialValue() {
+            return new HashMap<String, DateFormat>();
+        }
+    };
+
+    /**
+     * 获取日期格式化
+     *
+     * @param format
+     * @return
+     */
+    protected static DateFormat getDateFormat(String format) {
+        if (format == null || format.isEmpty()) {
+            return null;
+        }
+
+        Map<String, DateFormat> formats = threadLocal.get();
+        DateFormat result = formats.get(format);
+        if (result == null) {
+            result = new SimpleDateFormat(format);
+            formats.put(format, result);
+        }
+        return result;
+    }
 
     @Override
     public Object convert(final Conversion conversion) {
@@ -42,7 +73,7 @@ public class DateConverter implements Converter {
             }
             if (format != null) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat(format);
+                    DateFormat sdf = getDateFormat(format);
                     return sdf.parse(source);
                 } catch (ParseException e) {
                     return null;
