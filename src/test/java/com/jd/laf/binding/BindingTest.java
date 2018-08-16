@@ -68,7 +68,7 @@ public class BindingTest {
         Map<String, Object> context = createContext();
         Employee employee = new Employee();
         long time = System.currentTimeMillis();
-        int count = 1000000000;
+        int count = 1000000;
         for (int i = 0; i < count; i++) {
             bind(employee, context);
         }

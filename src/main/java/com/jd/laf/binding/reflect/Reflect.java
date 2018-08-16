@@ -3,6 +3,9 @@ package com.jd.laf.binding.reflect;
 import com.jd.laf.binding.Option;
 import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.ConverterSupplier.Operation;
+import com.jd.laf.binding.reflect.array.ArrayObject;
+import com.jd.laf.binding.reflect.array.ArraySuppliers;
+import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.*;
@@ -287,13 +290,14 @@ public abstract class Reflect {
                 //分割字符串
                 List<String> parts = split(value.toString(), format == null ? null : format.toString());
                 //构建数组
-                Object result = Array.newInstance(targetElementType, parts.size());
+                ArraySupplier arraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
+                ArrayObject array = arraySupplier.create(parts.size());
                 int pos = 0;
                 //遍历分割后的字符串进行转换
                 for (String part : parts) {
-                    Array.set(result, pos++, operation.execute(new Conversion(String.class, inboxElementType, part)));
+                    array.set(pos++, operation.execute(new Conversion(String.class, inboxElementType, part)));
                 }
-                return new Option(result);
+                return new Option(array.getArray());
             }
             return EMPTY_OPTION;
         }
@@ -485,7 +489,8 @@ public abstract class Reflect {
                 Class<?> sourceElementType;
                 //集合大小
                 int size = ((Collection) value).size();
-                Object result = Array.newInstance(targetElementType, size);
+                ArraySupplier arraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
+                ArrayObject array = arraySupplier.create(size);
                 Option option;
                 int count = 0;
                 for (Object v : ((Collection) value)) {
@@ -495,9 +500,9 @@ public abstract class Reflect {
                     if (option == null) {
                         return EMPTY_OPTION;
                     }
-                    Array.set(result, count++, option.get());
+                    array.set(count++, option.get());
                 }
-                return new Option(result);
+                return new Option(array.getArray());
             }
             return EMPTY_OPTION;
         }

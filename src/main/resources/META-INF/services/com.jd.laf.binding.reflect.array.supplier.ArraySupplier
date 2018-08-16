@@ -1,0 +1,16 @@
+com.jd.laf.binding.reflect.array.supplier.BooleanArraySupplier
+com.jd.laf.binding.reflect.array.supplier.ByteArraySupplier
+com.jd.laf.binding.reflect.array.supplier.DoubleArraySupplier
+com.jd.laf.binding.reflect.array.supplier.DynamicArraySupplier
+com.jd.laf.binding.reflect.array.supplier.FloatArraySupplier
+com.jd.laf.binding.reflect.array.supplier.IntegerArraySupplier
+com.jd.laf.binding.reflect.array.supplier.LongArraySupplier
+com.jd.laf.binding.reflect.array.supplier.PrimitiveBooleanArraySupplier
+com.jd.laf.binding.reflect.array.supplier.PrimitiveByteArraySupplier
+com.jd.laf.binding.reflect.array.supplier.PrimitiveDoubleArraySupplier
+com.jd.laf.binding.reflect.array.supplier.PrimitiveFloatArraySupplier
+com.jd.laf.binding.reflect.array.supplier.PrimitiveIntArraySupplier
+com.jd.laf.binding.reflect.array.supplier.PrimitiveLongArraySupplier
+com.jd.laf.binding.reflect.array.supplier.PrimitiveShortArraySupplier
+com.jd.laf.binding.reflect.array.supplier.ShortArraySupplier
+com.jd.laf.binding.reflect.array.supplier.StringArraySupplier
