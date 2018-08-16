@@ -236,8 +236,8 @@ public abstract class Reflect {
      * @param format     格式化信息
      * @throws Exception
      */
-    protected static Option convert(final Field field, final Class<?> targetType, final Class<?> sourceType,
-                                    final Object value, final Object format) throws Exception {
+    public static Option convert(final Field field, final Class<?> targetType, final Class<?> sourceType,
+                                 final Object value, final Object format) throws Exception {
         if (value == null || targetType == null || sourceType == null) {
             return null;
         }
