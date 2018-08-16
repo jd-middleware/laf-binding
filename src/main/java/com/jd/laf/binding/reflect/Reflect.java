@@ -147,6 +147,20 @@ public abstract class Reflect {
         }
     }
 
+    /**
+     * 绑定字段
+     *
+     * @param target 目标对象
+     * @param field  字段
+     * @param value  字段值
+     * @throws ReflectionException
+     */
+    public static boolean set(final Object target, final Field field, final Object value) throws ReflectionException {
+        if (field == null || value == null || target == null) {
+            return true;
+        }
+        return set(target, field, value, null, ReflectAccessorFactory.getInstance().getAccessor(field));
+    }
 
     /**
      * 绑定字段
