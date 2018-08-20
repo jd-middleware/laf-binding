@@ -44,17 +44,18 @@ public class CustomSupplier implements ConverterSupplier {
         if (plugins == null) {
             synchronized (CustomSupplier.class) {
                 if (plugins == null) {
-                    plugins = new HashMap<Class<?>, List<Converter>>();
+                    Map<Class<?>, List<Converter>> map = new HashMap<Class<?>, List<Converter>>();
                     //加载转换器插件
                     ServiceLoader<Converter> loader = ServiceLoader.load(Converter.class, CustomSupplier.class.getClassLoader());
                     for (Converter converter : loader) {
-                        List<Converter> list = plugins.get(converter.type());
+                        List<Converter> list = map.get(converter.type());
                         if (list == null) {
                             list = new ArrayList<Converter>(1);
-                            plugins.put(converter.type(), list);
+                            map.put(converter.type(), list);
                         }
                         list.add(converter);
                     }
+                    plugins = map;
 
                 }
             }

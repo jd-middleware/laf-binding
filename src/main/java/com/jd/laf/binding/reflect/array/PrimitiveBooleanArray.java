@@ -11,6 +11,10 @@ public class PrimitiveBooleanArray implements ArrayObject {
         array = new boolean[size];
     }
 
+    public PrimitiveBooleanArray(Object array) {
+        this.array = (boolean[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Boolean) value;
@@ -23,7 +27,7 @@ public class PrimitiveBooleanArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

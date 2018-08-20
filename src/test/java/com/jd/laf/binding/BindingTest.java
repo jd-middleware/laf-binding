@@ -45,6 +45,7 @@ public class BindingTest {
         context.put("company", new Company("testss"));
         context.put("sex", "MALE");
         context.put("ids", Arrays.asList("1", "2", "3"));
+        context.put("ids1", new String[]{"1", "2", "3"});
         context.put("myIds", "1,2,3");
         return context;
     }
@@ -111,7 +112,7 @@ public class BindingTest {
         private String company;
         @Value
         private Sex sex;
-        @Value
+        @Value("ids1")
         private Set<Integer> ids;
         @Value("ids")
         private int[] intIds;

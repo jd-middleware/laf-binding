@@ -11,6 +11,10 @@ public class ByteArray implements ArrayObject {
         array = new Byte[size];
     }
 
+    public ByteArray(Object array) {
+        this.array = (Byte[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Byte) value;
@@ -23,7 +27,7 @@ public class ByteArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

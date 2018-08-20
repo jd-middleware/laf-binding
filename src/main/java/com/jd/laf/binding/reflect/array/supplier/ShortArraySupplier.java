@@ -9,8 +9,13 @@ import com.jd.laf.binding.reflect.array.ShortArray;
 public class ShortArraySupplier implements ArraySupplier {
 
     @Override
-    public ArrayObject create(int size) {
+    public ArrayObject create(final int size) {
         return new ShortArray(size);
+    }
+
+    @Override
+    public ArrayObject wrap(final Object array) {
+        return new ShortArray(array);
     }
 
     @Override

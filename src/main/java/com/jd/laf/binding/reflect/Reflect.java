@@ -8,7 +8,10 @@ import com.jd.laf.binding.reflect.array.ArraySuppliers;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -174,6 +177,7 @@ public abstract class Reflect {
      */
     public static boolean set(final Object target, final Field field, final Object value, final Object format,
                               final FieldAccessorFactory factory) throws ReflectionException {
+        //TODO value为空需要绑定上
         if (field == null || value == null || target == null || factory == null) {
             return true;
         }
@@ -305,6 +309,7 @@ public abstract class Reflect {
                 List<String> parts = split(value.toString(), format == null ? null : format.toString());
                 //构建数组
                 ArraySupplier arraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
+                //arraySupplier不可能为空，里面有默认动态Array的实现
                 ArrayObject array = arraySupplier.create(parts.size());
                 int pos = 0;
                 //遍历分割后的字符串进行转换
@@ -369,30 +374,36 @@ public abstract class Reflect {
         if (targetType.isArray() && sourceType.isArray()) {
             //数据是文本，如果数组的元素支持转换，则分割文本进行转换
             Class<?> targetElementType = targetType.getComponentType();
+            Class<?> sourceElementType = sourceType.getComponentType();
             Class<?> inboxTargetElementType = inbox(targetElementType);
-            Class<?> inboxSourceElementType = inbox(sourceType.getComponentType());
+            Class<?> inboxSourceElementType = inbox(sourceElementType);
             if (inboxTargetElementType != null) {
                 if (inboxTargetElementType.equals(inboxSourceElementType)) {
                     return new Option(value);
                 }
-                //数组大小
-                int size = Array.getLength(value);
                 //构建数组
-                Object result = Array.newInstance(targetElementType, size);
+                ArraySupplier srcArraySupplier = ArraySuppliers.getArraySupplier(sourceElementType);
+                ArrayObject srcArray = srcArraySupplier.wrap(value);
+                //数组大小
+                int size = srcArray.length();
+                //构建数组
+                ArraySupplier targetArraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
+                //arraySupplier不可能为空，里面有默认动态Array的实现
+                ArrayObject targetArray = targetArraySupplier.create(size);
                 Option option;
                 Object element;
                 //遍历数组
                 for (int i = 0; i < size; i++) {
                     //递归转换元素
-                    element = Array.get(value, i);
+                    element = srcArray.get(i);
                     inboxSourceElementType = inboxSourceElementType != null ? inboxSourceElementType : (element == null ? null : element.getClass());
                     option = convert(null, inboxTargetElementType, inboxSourceElementType, element, format);
                     if (option == null) {
                         return EMPTY_OPTION;
                     }
-                    Array.set(result, i, option.get());
+                    targetArray.set(i, option.get());
                 }
-                return new Option(result);
+                return new Option(targetArray.getArray());
             }
             return EMPTY_OPTION;
         }
@@ -417,8 +428,11 @@ public abstract class Reflect {
             Class<?> targetElementType = inbox(getGenericType(field));
             if (targetElementType != null) {
                 Class<?> sourceElementType = sourceType.getComponentType();
+                //构建数组
+                ArraySupplier srcArraySupplier = ArraySuppliers.getArraySupplier(sourceElementType);
+                ArrayObject srcArray = srcArraySupplier.wrap(value);
                 //数组大小
-                int size = Array.getLength(value);
+                int size = srcArray.length();
                 Collection result = createCollection(targetType, size);
                 if (result != null) {
                     Option option;
@@ -426,7 +440,7 @@ public abstract class Reflect {
                     //遍历数组
                     for (int i = 0; i < size; i++) {
                         //递归转换元素
-                        element = Array.get(value, i);
+                        element = srcArray.get(i);
                         sourceElementType = sourceElementType != null ? sourceElementType : (element == null ? null : element.getClass());
                         option = convert(null, targetElementType, sourceElementType, element, format);
                         if (option == null) {

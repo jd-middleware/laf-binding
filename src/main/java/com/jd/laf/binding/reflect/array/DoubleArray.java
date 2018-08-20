@@ -11,6 +11,10 @@ public class DoubleArray implements ArrayObject {
         array = new Double[size];
     }
 
+    public DoubleArray(Object array) {
+        this.array = (Double[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Double) value;
@@ -23,7 +27,7 @@ public class DoubleArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

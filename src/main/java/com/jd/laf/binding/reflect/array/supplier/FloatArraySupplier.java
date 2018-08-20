@@ -9,8 +9,13 @@ import com.jd.laf.binding.reflect.array.FloatArray;
 public class FloatArraySupplier implements ArraySupplier {
 
     @Override
-    public ArrayObject create(int size) {
+    public ArrayObject create(final int size) {
         return new FloatArray(size);
+    }
+
+    @Override
+    public ArrayObject wrap(final Object array) {
+        return new FloatArray(array);
     }
 
     @Override

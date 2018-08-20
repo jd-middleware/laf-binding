@@ -14,6 +14,11 @@ public class LongArraySupplier implements ArraySupplier {
     }
 
     @Override
+    public ArrayObject wrap(final Object array) {
+        return new LongArray(array);
+    }
+
+    @Override
     public boolean support(final Class<?> clazz) {
         return Long.class.equals(clazz);
     }

@@ -11,6 +11,10 @@ public class LongArray implements ArrayObject {
         array = new Long[size];
     }
 
+    public LongArray(Object array) {
+        this.array = (Long[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Long) value;
@@ -23,7 +27,7 @@ public class LongArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

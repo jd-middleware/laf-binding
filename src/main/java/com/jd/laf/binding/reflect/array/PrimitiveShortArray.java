@@ -11,6 +11,10 @@ public class PrimitiveShortArray implements ArrayObject {
         array = new short[size];
     }
 
+    public PrimitiveShortArray(Object array) {
+        this.array = (short[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Short) value;
@@ -23,7 +27,7 @@ public class PrimitiveShortArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

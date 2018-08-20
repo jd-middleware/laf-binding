@@ -9,8 +9,13 @@ import com.jd.laf.binding.reflect.array.IntegerArray;
 public class IntegerArraySupplier implements ArraySupplier {
 
     @Override
-    public ArrayObject create(int size) {
+    public ArrayObject create(final int size) {
         return new IntegerArray(size);
+    }
+
+    @Override
+    public ArrayObject wrap(final Object array) {
+        return new IntegerArray(array);
     }
 
     @Override

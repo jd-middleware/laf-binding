@@ -11,6 +11,10 @@ public class PrimitiveLongArray implements ArrayObject {
         array = new long[size];
     }
 
+    public PrimitiveLongArray(Object array) {
+        this.array = (long[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Long) value;
@@ -23,7 +27,7 @@ public class PrimitiveLongArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

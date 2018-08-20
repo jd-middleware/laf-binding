@@ -9,8 +9,13 @@ import com.jd.laf.binding.reflect.array.PrimitiveShortArray;
 public class PrimitiveShortArraySupplier implements ArraySupplier {
 
     @Override
-    public ArrayObject create(int size) {
+    public ArrayObject create(final int size) {
         return new PrimitiveShortArray(size);
+    }
+
+    @Override
+    public ArrayObject wrap(final Object array) {
+        return new PrimitiveShortArray(array);
     }
 
     @Override

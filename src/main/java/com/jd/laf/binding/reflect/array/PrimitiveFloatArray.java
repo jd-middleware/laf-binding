@@ -11,6 +11,10 @@ public class PrimitiveFloatArray implements ArrayObject {
         array = new float[size];
     }
 
+    public PrimitiveFloatArray(Object array) {
+        this.array = (float[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Float) value;
@@ -23,7 +27,7 @@ public class PrimitiveFloatArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

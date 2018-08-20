@@ -11,6 +11,10 @@ public class StringArray implements ArrayObject {
         array = new String[size];
     }
 
+    public StringArray(Object array) {
+        this.array = (String[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (String) value;
@@ -23,7 +27,7 @@ public class StringArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override

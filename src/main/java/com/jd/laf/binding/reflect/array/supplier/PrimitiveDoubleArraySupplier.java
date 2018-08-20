@@ -9,8 +9,13 @@ import com.jd.laf.binding.reflect.array.PrimitiveDoubleArray;
 public class PrimitiveDoubleArraySupplier implements ArraySupplier {
 
     @Override
-    public ArrayObject create(int size) {
+    public ArrayObject create(final int size) {
         return new PrimitiveDoubleArray(size);
+    }
+
+    @Override
+    public ArrayObject wrap(final Object array) {
+        return new PrimitiveDoubleArray(array);
     }
 
     @Override

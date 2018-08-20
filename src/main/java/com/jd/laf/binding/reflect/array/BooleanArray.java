@@ -11,6 +11,10 @@ public class BooleanArray implements ArrayObject {
         array = new Boolean[size];
     }
 
+    public BooleanArray(Object array) {
+        this.array = (Boolean[]) array;
+    }
+
     @Override
     public void set(final int index, final Object value) {
         array[index] = (Boolean) value;
@@ -23,7 +27,7 @@ public class BooleanArray implements ArrayObject {
 
     @Override
     public int length() {
-        return array.length;
+        return array == null ? 0 : array.length;
     }
 
     @Override
