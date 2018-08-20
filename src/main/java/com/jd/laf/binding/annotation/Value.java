@@ -23,8 +23,22 @@ public @interface Value {
     /**
      * 数据转换参数
      *
-     * @return
+     * @return 转换参数
      */
     String format() default "";
+
+    /**
+     * 是否可以为空
+     *
+     * @return 为空标识
+     */
+    boolean nullable() default false;
+
+    /**
+     * 默认值
+     *
+     * @return 默认值
+     */
+    String defaultValue() default "";
 
 }

@@ -156,11 +156,12 @@ public abstract class Reflect {
      * @param target 目标对象
      * @param field  字段
      * @param value  字段值
+     * @return 是否成功
      * @throws ReflectionException
      */
     public static boolean set(final Object target, final Field field, final Object value) throws ReflectionException {
-        if (field == null || value == null || target == null) {
-            return true;
+        if (field == null || target == null) {
+            return false;
         }
         return set(target, field, value, null, ReflectAccessorFactory.getInstance().getAccessor(field));
     }
@@ -173,13 +174,13 @@ public abstract class Reflect {
      * @param value   字段值
      * @param format  格式化
      * @param factory 字段访问工厂
+     * @return 是否成功
      * @throws ReflectionException
      */
     public static boolean set(final Object target, final Field field, final Object value, final Object format,
                               final FieldAccessorFactory factory) throws ReflectionException {
-        //TODO value为空需要绑定上
-        if (field == null || value == null || target == null || factory == null) {
-            return true;
+        if (field == null || target == null || factory == null) {
+            return false;
         }
         return set(target, field, value, format, factory.getAccessor(field));
     }
@@ -191,12 +192,13 @@ public abstract class Reflect {
      * @param field   字段
      * @param value   字段值
      * @param factory 字段访问工厂
+     * @return 是否成功
      * @throws ReflectionException
      */
     public static boolean set(final Object target, final Field field, final Object value,
                               final FieldAccessorFactory factory) throws ReflectionException {
-        if (field == null || value == null || target == null || factory == null) {
-            return true;
+        if (field == null || target == null || factory == null) {
+            return false;
         }
         return set(target, field, value, null, factory.getAccessor(field));
     }
@@ -223,14 +225,25 @@ public abstract class Reflect {
      * @param value    字段值
      * @param format   格式化信息
      * @param accessor 字段访问对象
+     * @return 是否成功
      * @throws ReflectionException
      */
     public static boolean set(final Object target, final Field field, final Object value, final Object format,
                               final FieldAccessor accessor) throws ReflectionException {
-        if (field == null || value == null || target == null || accessor == null) {
-            return true;
+        if (field == null || target == null || accessor == null) {
+            return false;
         }
         try {
+            Class<?> type = field.getType();
+            if (value == null) {
+                //值为空
+                if (type.isPrimitive()) {
+                    //基本类型不能为空
+                    return false;
+                }
+                accessor.set(target, null);
+                return true;
+            }
             Option option = convert(field, field.getType(), value.getClass(), value, format);
             if (option != null && option.get() != null) {
                 accessor.set(target, option.get());

@@ -27,6 +27,7 @@ public class BindingTest {
         Assert.assertEquals(employee.getIntIds().length, 3);
         Assert.assertEquals(employee.getMyIds().length, 3);
         Assert.assertEquals(employee.getIdSet().size(), 3);
+        Assert.assertEquals(employee.getToken(), "123");
     }
 
     protected void bind(final Employee employee, final Map<String, Object> context) throws ReflectionException {
@@ -47,6 +48,7 @@ public class BindingTest {
         context.put("ids", Arrays.asList("1", "2", "3"));
         context.put("ids1", new String[]{"1", "2", "3"});
         context.put("myIds", "1,2,3");
+        context.put("token", null);
         return context;
     }
 
@@ -120,6 +122,8 @@ public class BindingTest {
         private int[] myIds;
         @Value(value = "myIds")
         private SortedSet<Integer> idSet;
+        @Value(nullable = false)
+        private String token = "123";
 
         public String getName() {
             return name;
@@ -223,6 +227,14 @@ public class BindingTest {
 
         public void setIdSet(SortedSet<Integer> idSet) {
             this.idSet = idSet;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
         }
     }
 

@@ -28,7 +28,17 @@ public class ValueBinder implements Binder {
         String name = value.value() == null || value.value().isEmpty() ? field.getName() : value.value();
         //获取属性值
         Object result = evaluate(source, name, factory);
-
+        if (result == null) {
+            //为空，获取默认值
+            String defaultValue = value.defaultValue();
+            if (defaultValue != null && !defaultValue.isEmpty()) {
+                result = defaultValue;
+            }
+        }
+        if (!value.nullable() && result == null) {
+            //判断不能为空
+            return false;
+        }
         return set(target, field, result, value.format(), factory);
     }
 
