@@ -32,7 +32,7 @@ public @interface Value {
      *
      * @return 为空标识
      */
-    boolean nullable() default false;
+    boolean nullable() default true;
 
     /**
      * 默认值
