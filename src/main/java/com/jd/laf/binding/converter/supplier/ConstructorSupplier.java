@@ -1,12 +1,13 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.Option;
+import com.jd.laf.binding.converter.Conversion;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.jd.laf.binding.reflect.Primitive.inbox;
+import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
  * 根据构造函数进行转换
@@ -16,7 +17,6 @@ public class ConstructorSupplier implements ConverterSupplier {
     //单参数构造函数映射
     protected static ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Constructor>>> constructors =
             new ConcurrentHashMap<Class<?>, ConcurrentMap<Class<?>, Option<Constructor>>>();
-
 
     @Override
     public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
@@ -30,7 +30,7 @@ public class ConstructorSupplier implements ConverterSupplier {
 
     @Override
     public int order() {
-        return 1;
+        return CONSTRUCTOR_SUPPLIER_ORDER;
     }
 
     /**
@@ -93,7 +93,7 @@ public class ConstructorSupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            return conversion == null ? null : constructor.newInstance(conversion.source);
+            return conversion == null ? null : constructor.newInstance(conversion.getSource());
         }
     }
 

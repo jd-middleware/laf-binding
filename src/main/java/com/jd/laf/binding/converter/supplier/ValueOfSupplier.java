@@ -1,4 +1,4 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.Option;
 
@@ -7,18 +7,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * 根据静态的fromString方法进行转换
+ * 根据静态的valueOf方法进行转换
  */
-public class fromStringSupplier extends StaticMethodSupplier {
+public class ValueOfSupplier extends StaticMethodSupplier {
 
     //单参数构造函数映射
     protected static ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Method>>> methods =
             new ConcurrentHashMap<Class<?>, ConcurrentMap<Class<?>, Option<Method>>>();
 
-    public static final String FROM_STRING = "fromString";
+    public static final String VALUE_OF = "valueOf";
 
-    public fromStringSupplier() {
-        super(FROM_STRING);
+    public ValueOfSupplier() {
+        super(VALUE_OF);
+    }
+
+    @Override
+    public int order() {
+        return VALUE_OF_SUPPLIER_ORDER;
     }
 
     @Override

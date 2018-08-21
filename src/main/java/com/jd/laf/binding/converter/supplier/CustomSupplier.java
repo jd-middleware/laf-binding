@@ -1,7 +1,9 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.supplier;
 
 
 import com.jd.laf.binding.Option;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.Converter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +31,7 @@ public class CustomSupplier implements ConverterSupplier {
 
     @Override
     public int order() {
-        return 0;
+        return CUSTOM_SUPPLIER_ORDER;
     }
 
     /**
@@ -98,7 +100,7 @@ public class CustomSupplier implements ConverterSupplier {
     /**
      * 自定义转换器转换操作
      */
-    public static final class CustomOperation implements Operation {
+    protected static final class CustomOperation implements Operation {
 
         protected final Converter converter;
 

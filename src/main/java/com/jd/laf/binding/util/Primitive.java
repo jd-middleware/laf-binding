@@ -1,4 +1,4 @@
-package com.jd.laf.binding.reflect;
+package com.jd.laf.binding.util;
 
 /**
  * 私有对象工具类

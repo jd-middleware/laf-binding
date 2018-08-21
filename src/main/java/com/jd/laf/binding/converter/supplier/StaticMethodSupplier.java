@@ -1,13 +1,14 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.Option;
+import com.jd.laf.binding.converter.Conversion;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.jd.laf.binding.reflect.Primitive.inbox;
+import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
  * 根据静态工厂方法进行转换
@@ -23,10 +24,6 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
         this.methodName = methodName;
     }
 
-    @Override
-    public int order() {
-        return 3;
-    }
 
     @Override
     public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
@@ -107,7 +104,7 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            return conversion == null ? null : method.invoke(null, conversion.source);
+            return conversion == null ? null : method.invoke(null, conversion.getSource());
         }
     }
 

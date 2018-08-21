@@ -1,7 +1,7 @@
 package com.jd.laf.binding.converter;
 
 /**
- * 自定义类型转换
+ * 自定义简单类型转换，不支持集合和数组，字符串和数组，字符串和集合直接的转换
  */
 public interface Converter {
 

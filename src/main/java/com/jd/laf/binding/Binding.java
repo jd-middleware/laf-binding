@@ -5,6 +5,7 @@ import com.jd.laf.binding.binder.Binder;
 import com.jd.laf.binding.binder.Binder.Context;
 import com.jd.laf.binding.reflect.*;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
+import com.jd.laf.binding.util.SuperClassIterator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

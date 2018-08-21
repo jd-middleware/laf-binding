@@ -2,30 +2,23 @@ package com.jd.laf.binding.reflect;
 
 import com.jd.laf.binding.Option;
 import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.ConverterSupplier.Operation;
-import com.jd.laf.binding.reflect.array.ArrayObject;
-import com.jd.laf.binding.reflect.array.ArraySuppliers;
-import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
+import com.jd.laf.binding.converter.supplier.ConverterSupplier.Operation;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
+import com.jd.laf.binding.util.SuperClassIterator;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.jd.laf.binding.converter.Converters.getOperation;
-import static com.jd.laf.binding.reflect.Primitive.inbox;
 import static com.jd.laf.binding.reflect.PropertyGetters.getPropertyGetter;
+import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
  * 反射工具类
  */
 public abstract class Reflect {
 
-    public static final Option EMPTY_OPTION = new Option(null);
     //类的字段名和字段映射
     protected static ConcurrentMap<Class<?>, ConcurrentMap<String, Option<Field>>> fields =
             new ConcurrentHashMap<Class<?>, ConcurrentMap<String, Option<Field>>>();
@@ -244,10 +237,18 @@ public abstract class Reflect {
                 accessor.set(target, null);
                 return true;
             }
-            Option option = convert(field, field.getType(), value.getClass(), value, format);
-            if (option != null && option.get() != null) {
-                accessor.set(target, option.get());
-                return true;
+            Class<?> inboxTargetType = inbox(field.getType());
+            Class<?> inboxSourceType = inbox(value.getClass());
+            //获取转换器
+            Operation operation = getOperation(inboxSourceType, inboxTargetType);
+            if (operation != null) {
+                //拿到转换器
+                Object obj = operation.execute(new Conversion(inboxSourceType, inboxTargetType, value, format, field));
+                if (obj != null) {
+                    //转换成功
+                    accessor.set(target, obj);
+                    return true;
+                }
             }
             return false;
         } catch (ReflectionException e) {
@@ -255,415 +256,6 @@ public abstract class Reflect {
         } catch (Exception e) {
             throw new ReflectionException(e.getMessage(), e);
         }
-    }
-
-    /**
-     * 绑定字段
-     *
-     * @param field      所属字段
-     * @param targetType 目标类型
-     * @param sourceType 原始类型
-     * @param value      值
-     * @param format     格式化信息
-     * @throws Exception
-     */
-    public static Option convert(final Field field, final Class<?> targetType, final Class<?> sourceType,
-                                 final Object value, final Object format) throws Exception {
-        if (value == null || targetType == null || sourceType == null) {
-            return null;
-        }
-        Class<?> inboxTargetType = inbox(targetType);
-        Class<?> inboxSourceType = inbox(sourceType);
-        Option option = null;
-        //获取自定义转换器
-        Operation operation = getOperation(inboxSourceType, inboxTargetType);
-        if (operation != null) {
-            option = new Option(operation.execute(new Conversion(inboxSourceType, inboxTargetType, value, format)));
-        } else {
-            option = String2Array(inboxTargetType, inboxSourceType, value, format);
-            if (option == null) {
-                option = string2Collection(field, inboxTargetType, inboxSourceType, value, format);
-                if (option == null) {
-                    option = array2Array(inboxTargetType, inboxSourceType, value, format);
-                    if (option == null) {
-                        option = array2Collection(field, inboxTargetType, inboxSourceType, value, format);
-                        if (option == null) {
-                            option = collection2Collection(field, inboxTargetType, inboxSourceType, value, format);
-                            if (option == null) {
-                                option = collection2Array(field, inboxTargetType, inboxSourceType, value, format);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return option;
-    }
-
-    /**
-     * 把字符串转换成数组
-     *
-     * @param targetType 目标类型
-     * @param sourceType 原始类型
-     * @param value      值对象
-     * @param format     转换格式化
-     * @return 转换后的对象
-     * @throws Exception
-     */
-    protected static Option String2Array(final Class<?> targetType, final Class<?> sourceType, final Object value,
-                                         final Object format) throws Exception {
-        if (targetType.isArray() && CharSequence.class.isAssignableFrom(sourceType)) {
-            //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> targetElementType = targetType.getComponentType();
-            Class<?> inboxElementType = inbox(targetElementType);
-            Operation operation = getOperation(String.class, inboxElementType);
-            if (operation != null) {
-                //分割字符串
-                List<String> parts = split(value.toString(), format == null ? null : format.toString());
-                //构建数组
-                ArraySupplier arraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
-                //arraySupplier不可能为空，里面有默认动态Array的实现
-                ArrayObject array = arraySupplier.create(parts.size());
-                int pos = 0;
-                //遍历分割后的字符串进行转换
-                for (String part : parts) {
-                    array.set(pos++, operation.execute(new Conversion(String.class, inboxElementType, part)));
-                }
-                return new Option(array.getArray());
-            }
-            return EMPTY_OPTION;
-        }
-        return null;
-    }
-
-    /**
-     * 把字符串转换成集合
-     *
-     * @param field      字段
-     * @param targetType 目标类型
-     * @param sourceType 原始类型
-     * @param value      值对象
-     * @param format     转换格式化
-     * @return 转换后的对象
-     * @throws Exception
-     */
-    protected static Option string2Collection(final Field field, final Class<?> targetType, final Class<?> sourceType,
-                                              final Object value, final Object format) throws Exception {
-        if (Collection.class.isAssignableFrom(targetType) && CharSequence.class.isAssignableFrom(sourceType)) {
-            //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> elementType = inbox(getGenericType(field));
-            if (elementType != null) {
-                Operation operation = getOperation(String.class, elementType);
-                if (operation != null) {
-                    //分割字符串
-                    List<String> parts = split(value.toString(), format == null ? null : format.toString());
-                    Collection result = createCollection(targetType, parts.size());
-                    if (result != null) {
-                        //遍历分割后的字符串进行转换
-                        for (String part : parts) {
-                            result.add(operation.execute(new Conversion(String.class, elementType, part)));
-                        }
-                        return new Option(result);
-                    }
-                }
-            }
-            return EMPTY_OPTION;
-        }
-        return null;
-    }
-
-    /**
-     * 数组转换成数组
-     *
-     * @param targetType 目标类型
-     * @param sourceType 原始类型
-     * @param value      值对象
-     * @param format     格式化
-     * @return 成功标识
-     * @throws Exception
-     */
-    protected static Option array2Array(final Class<?> targetType, final Class<?> sourceType,
-                                        final Object value, final Object format) throws Exception {
-        if (targetType.isArray() && sourceType.isArray()) {
-            //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> targetElementType = targetType.getComponentType();
-            Class<?> sourceElementType = sourceType.getComponentType();
-            Class<?> inboxTargetElementType = inbox(targetElementType);
-            Class<?> inboxSourceElementType = inbox(sourceElementType);
-            if (inboxTargetElementType != null) {
-                if (inboxTargetElementType.equals(inboxSourceElementType)) {
-                    return new Option(value);
-                }
-                //构建数组
-                ArraySupplier srcArraySupplier = ArraySuppliers.getArraySupplier(sourceElementType);
-                ArrayObject srcArray = srcArraySupplier.wrap(value);
-                //数组大小
-                int size = srcArray.length();
-                //构建数组
-                ArraySupplier targetArraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
-                //arraySupplier不可能为空，里面有默认动态Array的实现
-                ArrayObject targetArray = targetArraySupplier.create(size);
-                Option option;
-                Object element;
-                //遍历数组
-                for (int i = 0; i < size; i++) {
-                    //递归转换元素
-                    element = srcArray.get(i);
-                    inboxSourceElementType = inboxSourceElementType != null ? inboxSourceElementType : (element == null ? null : element.getClass());
-                    option = convert(null, inboxTargetElementType, inboxSourceElementType, element, format);
-                    if (option == null) {
-                        return EMPTY_OPTION;
-                    }
-                    targetArray.set(i, option.get());
-                }
-                return new Option(targetArray.getArray());
-            }
-            return EMPTY_OPTION;
-        }
-        return null;
-    }
-
-    /**
-     * 数组转换成集合
-     *
-     * @param field      字段
-     * @param targetType 目标类型
-     * @param sourceType 原始类型
-     * @param value      值对象
-     * @param format     格式化
-     * @return 成功标识
-     * @throws Exception
-     */
-    protected static Option array2Collection(final Field field, final Class<?> targetType, final Class<?> sourceType,
-                                             final Object value, final Object format) throws Exception {
-        if (Collection.class.isAssignableFrom(targetType) && sourceType.isArray()) {
-            //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> targetElementType = inbox(getGenericType(field));
-            if (targetElementType != null) {
-                Class<?> sourceElementType = sourceType.getComponentType();
-                //构建数组
-                ArraySupplier srcArraySupplier = ArraySuppliers.getArraySupplier(sourceElementType);
-                ArrayObject srcArray = srcArraySupplier.wrap(value);
-                //数组大小
-                int size = srcArray.length();
-                Collection result = createCollection(targetType, size);
-                if (result != null) {
-                    Option option;
-                    Object element;
-                    //遍历数组
-                    for (int i = 0; i < size; i++) {
-                        //递归转换元素
-                        element = srcArray.get(i);
-                        sourceElementType = sourceElementType != null ? sourceElementType : (element == null ? null : element.getClass());
-                        option = convert(null, targetElementType, sourceElementType, element, format);
-                        if (option == null) {
-                            return EMPTY_OPTION;
-                        }
-                        result.add(option.get());
-                    }
-                    return new Option(result);
-                }
-            }
-            return EMPTY_OPTION;
-        }
-        return null;
-    }
-
-    /**
-     * 集合转换成集合
-     *
-     * @param field      字段
-     * @param targetType 目标类型
-     * @param sourceType 原始类型
-     * @param value      值对象
-     * @param format     格式化
-     * @return 成功标识
-     * @throws Exception
-     */
-    protected static Option collection2Collection(final Field field, final Class<?> targetType, final Class<?> sourceType,
-                                                  final Object value, final Object format) throws Exception {
-        if (Collection.class.isAssignableFrom(targetType) && Collection.class.isAssignableFrom(sourceType)) {
-            //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> targetElementType = inbox(getGenericType(field));
-            if (targetElementType != null) {
-                Class<?> sourceElementType;
-                //集合大小
-                int size = ((Collection) value).size();
-                Collection result = createCollection(targetType, size);
-                if (result != null) {
-                    Option option;
-                    for (Object v : ((Collection) value)) {
-                        sourceElementType = v != null ? v.getClass() : null;
-                        //递归转换元素
-                        option = convert(null, targetElementType, sourceElementType, v, format);
-                        if (option == null) {
-                            return EMPTY_OPTION;
-                        }
-                        result.add(option.get());
-                    }
-                    return new Option(result);
-                }
-            }
-            return EMPTY_OPTION;
-        }
-        return null;
-    }
-
-    /**
-     * 集合转换成数组
-     *
-     * @param field      字段
-     * @param targetType 目标类型
-     * @param sourceType 原始类型
-     * @param value      值对象
-     * @param format     格式化
-     * @return 成功标识
-     * @throws Exception
-     */
-    protected static Option collection2Array(final Field field, final Class<?> targetType, final Class<?> sourceType,
-                                             final Object value, final Object format) throws Exception {
-        if (targetType.isArray() && Collection.class.isAssignableFrom(sourceType)) {
-            //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> targetElementType = targetType.getComponentType();
-            Class<?> inboxTargetElementType = inbox(targetElementType);
-            if (inboxTargetElementType != null) {
-                Class<?> sourceElementType;
-                //集合大小
-                int size = ((Collection) value).size();
-                ArraySupplier arraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
-                ArrayObject array = arraySupplier.create(size);
-                Option option;
-                int count = 0;
-                for (Object v : ((Collection) value)) {
-                    sourceElementType = v != null ? v.getClass() : null;
-                    //递归转换元素
-                    option = convert(null, inboxTargetElementType, sourceElementType, v, format);
-                    if (option == null) {
-                        return EMPTY_OPTION;
-                    }
-                    array.set(count++, option.get());
-                }
-                return new Option(array.getArray());
-            }
-            return EMPTY_OPTION;
-        }
-        return null;
-    }
-
-
-    /**
-     * 创建集合对象
-     *
-     * @param targetType
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    protected static Collection createCollection(Class<?> targetType, int size) throws Exception {
-        if (targetType.equals(List.class)) {
-            return new ArrayList(size);
-        } else if (targetType.equals(Set.class)) {
-            return new HashSet(size);
-        } else if (targetType.equals(SortedSet.class)) {
-            return new TreeSet();
-        } else if (targetType.isInterface()) {
-            // 接口
-            return null;
-        } else if (Modifier.isAbstract(targetType.getModifiers())) {
-            //抽象方法
-            return null;
-        } else {
-            return (Collection) targetType.newInstance();
-        }
-    }
-
-    /**
-     * 按照字符串分割
-     *
-     * @param value
-     * @param delimiter
-     * @return
-     */
-    protected static List<String> split(final String value, final String delimiter) {
-        List<String> result = new LinkedList<String>();
-        if (delimiter == null || delimiter.isEmpty()) {
-            return split(value, ',');
-        } else if (delimiter.length() == 1) {
-            return split(value, delimiter.charAt(0));
-        }
-        int length = value.length();
-        int maxPos = delimiter.length() - 1;
-        int start = 0;
-        int pos = 0;
-        int end = 0;
-        for (int i = 0; i < length; i++) {
-            if (value.charAt(i) == delimiter.charAt(pos)) {
-                if (pos++ == maxPos) {
-                    if (end > start) {
-                        result.add(value.substring(start, end + 1));
-                    }
-                    pos = 0;
-                    start = i + 1;
-                }
-            } else {
-                end = i;
-            }
-        }
-        if (start < length) {
-            result.add(value.substring(start, length));
-        }
-        return result;
-    }
-
-    /**
-     * 按照字符分割
-     *
-     * @param value
-     * @param delimiter
-     * @return
-     */
-    protected static List<String> split(final String value, final char delimiter) {
-        List<String> result = new LinkedList<String>();
-        int len = value.length();
-        int start = 0;
-        for (int i = 0; i < len; i++) {
-            if (value.charAt(i) == delimiter) {
-                if (i > start) {
-                    result.add(value.substring(start, i));
-                }
-                start = i + 1;
-            }
-        }
-        if (start < len) {
-            result.add(value.substring(start, len));
-        }
-        return result;
-    }
-
-    /**
-     * 获取泛型
-     *
-     * @param field
-     * @return
-     */
-    protected static Class getGenericType(final Field field) {
-        if (field == null) {
-            return null;
-        }
-        Type type = field.getGenericType();
-        if (type == null) {
-            return null;
-        }
-        // 如果是泛型参数的类型
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) type;
-            //得到泛型里的class类型对象
-            type = pt.getActualTypeArguments()[0];
-            if (type instanceof Class) {
-                return (Class) type;
-            }
-        }
-        return null;
     }
 
 }

@@ -1,9 +1,31 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.supplier;
+
+import com.jd.laf.binding.converter.Conversion;
 
 /**
  * 转换提供者
  */
 public interface ConverterSupplier {
+
+    int CUSTOM_SUPPLIER_ORDER = 0;
+
+    int CONSTRUCTOR_SUPPLIER_ORDER = 1;
+
+    int VALUE_OF_SUPPLIER_ORDER = 2;
+
+    int FROM_STRING_SUPPLIER_ORDER = 2;
+
+    int STRING_TO_ARRAY_ORDER = 99;
+
+    int STRING_TO_COLLECTION_ORDER = 99;
+
+    int ARRAY_TO_ARRAY_ORDER = 99;
+
+    int ARRAY_TO_COLLECTION_ORDER = 99;
+
+    int COLLECTION_TO_ARRAY_ORDER = 99;
+
+    int COLLECTION_TO_COLLECTION_ORDER = 99;
 
     /**
      * 获取转换操作
