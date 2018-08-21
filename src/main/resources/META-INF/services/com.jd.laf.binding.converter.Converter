@@ -8,3 +8,6 @@ com.jd.laf.binding.converter.IntConverter
 com.jd.laf.binding.converter.LongConverter
 com.jd.laf.binding.converter.ShortConverter
 com.jd.laf.binding.converter.StringConverter
+com.jd.laf.binding.converter.AtomicBooleanConverter
+com.jd.laf.binding.converter.AtomicIntegerConverter
+com.jd.laf.binding.converter.AtomicLongConverter
