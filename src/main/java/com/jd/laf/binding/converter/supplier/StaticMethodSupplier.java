@@ -27,9 +27,6 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
 
     @Override
     public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (sourceType == null || targetType == null) {
-            return null;
-        }
         // 判断是否有构造函数
         Method method = getMethod(targetType, sourceType, methodName, getCache());
         return method == null ? null : new MethodOperation(method);

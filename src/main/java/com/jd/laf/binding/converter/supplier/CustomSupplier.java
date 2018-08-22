@@ -22,9 +22,6 @@ public class CustomSupplier implements ConverterSupplier {
 
     @Override
     public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (sourceType == null || targetType == null) {
-            return null;
-        }
         Converter converter = getConverter(sourceType, targetType);
         return converter == null ? null : new CustomOperation(converter);
     }

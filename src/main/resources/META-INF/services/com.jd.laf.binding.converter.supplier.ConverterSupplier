@@ -8,3 +8,4 @@ com.jd.laf.binding.converter.supplier.fromStringSupplier
 com.jd.laf.binding.converter.supplier.String2ArraySupplier
 com.jd.laf.binding.converter.supplier.String2CollectionSupplier
 com.jd.laf.binding.converter.supplier.ValueOfSupplier
+com.jd.laf.binding.converter.supplier.Map2ObjectSupplier

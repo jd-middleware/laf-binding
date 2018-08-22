@@ -3,7 +3,7 @@ package com.jd.laf.binding.converter.supplier;
 import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.Converters;
 import com.jd.laf.binding.util.Collections;
-import com.jd.laf.binding.util.Generics;
+import com.jd.laf.binding.reflect.Generics;
 
 import java.util.Collection;
 

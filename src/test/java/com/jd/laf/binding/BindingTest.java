@@ -22,12 +22,14 @@ public class BindingTest {
         Assert.assertEquals(employee.height, 500);
         Assert.assertNotNull(employee.birthDay);
         Assert.assertEquals(employee.company, "testss");
+        Assert.assertEquals(employee.getCompany1().getName(), "name1");
         Assert.assertEquals(employee.sex, Sex.MALE);
         Assert.assertEquals(employee.getIds().size(), 3);
         Assert.assertEquals(employee.getIntIds().length, 3);
         Assert.assertEquals(employee.getMyIds().length, 3);
         Assert.assertEquals(employee.getIdSet().size(), 3);
         Assert.assertEquals(employee.getToken(), "123");
+
     }
 
     protected void bind(final Employee employee, final Map<String, Object> context) throws ReflectionException {
@@ -35,6 +37,8 @@ public class BindingTest {
     }
 
     protected Map<String, Object> createContext() {
+        Map<String, Object> company = new HashMap<String, Object>();
+        company.put("name", "name1");
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("name", "name");
         context.put("age", 27);
@@ -44,6 +48,7 @@ public class BindingTest {
         context.put("height1", 500);
         context.put("birthDay", "1970-01-01");
         context.put("company", new Company("testss"));
+        context.put("company1", company);
         context.put("sex", "MALE");
         context.put("ids", Arrays.asList("1", "2", "3"));
         context.put("ids1", new String[]{"1", "2", "3"});
@@ -82,6 +87,9 @@ public class BindingTest {
     public static class Company {
         private String name;
 
+        public Company() {
+        }
+
         public Company(String name) {
             this.name = name;
         }
@@ -112,6 +120,8 @@ public class BindingTest {
         private Date birthDay;
         @Value("company.name")
         private String company;
+        @Value
+        private Company company1;
         @Value
         private Sex sex;
         @Value("ids1")
@@ -187,6 +197,14 @@ public class BindingTest {
 
         public void setCompany(String company) {
             this.company = company;
+        }
+
+        public Company getCompany1() {
+            return company1;
+        }
+
+        public void setCompany1(Company company1) {
+            this.company1 = company1;
         }
 
         public Sex getSex() {

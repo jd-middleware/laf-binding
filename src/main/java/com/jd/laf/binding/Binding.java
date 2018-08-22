@@ -3,7 +3,10 @@ package com.jd.laf.binding;
 
 import com.jd.laf.binding.binder.Binder;
 import com.jd.laf.binding.binder.Binder.Context;
-import com.jd.laf.binding.reflect.*;
+import com.jd.laf.binding.reflect.FieldAccessor;
+import com.jd.laf.binding.reflect.FieldAccessorFactory;
+import com.jd.laf.binding.reflect.Reflect;
+import com.jd.laf.binding.reflect.ReflectAccessorFactory;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 import com.jd.laf.binding.util.SuperClassIterator;
 
@@ -15,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.jd.laf.binding.binder.Binders.getBinder;
-import static com.jd.laf.binding.reflect.Reflect.getField;
+import static com.jd.laf.binding.reflect.Fields.getField;
 
 /**
  * 绑定器

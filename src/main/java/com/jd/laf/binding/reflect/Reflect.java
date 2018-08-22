@@ -1,16 +1,13 @@
 package com.jd.laf.binding.reflect;
 
-import com.jd.laf.binding.Option;
 import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.supplier.ConverterSupplier.Operation;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
-import com.jd.laf.binding.util.SuperClassIterator;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.jd.laf.binding.converter.Converters.getOperation;
+import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.reflect.PropertyGetters.getPropertyGetter;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
@@ -18,53 +15,6 @@ import static com.jd.laf.binding.util.Primitive.inbox;
  * 反射工具类
  */
 public abstract class Reflect {
-
-    //类的字段名和字段映射
-    protected static ConcurrentMap<Class<?>, ConcurrentMap<String, Option<Field>>> fields =
-            new ConcurrentHashMap<Class<?>, ConcurrentMap<String, Option<Field>>>();
-
-    /**
-     * 获取类的字段
-     *
-     * @param clazz 类
-     * @param name  属性名
-     * @return 字段
-     * @throws ReflectionException
-     */
-    public static Field getField(final Class<?> clazz, final String name) throws ReflectionException {
-        if (clazz == null || clazz.isPrimitive() || name == null || name.isEmpty()) {
-            return null;
-        }
-        ConcurrentMap<String, Option<Field>> options = fields.get(clazz);
-        if (options == null) {
-            options = new ConcurrentHashMap<String, Option<Field>>();
-            ConcurrentMap<String, Option<Field>> exist = fields.putIfAbsent(clazz, options);
-            if (exist != null) {
-                options = exist;
-            }
-        }
-        Option<Field> option = options.get(name);
-        if (option == null) {
-            Field field = null;
-            SuperClassIterator iterator = new SuperClassIterator(clazz);
-            while (iterator.hasNext()) {
-                try {
-                    field = iterator.next().getDeclaredField(name);
-                    break;
-                } catch (NoSuchFieldException e) {
-                } catch (SecurityException e) {
-                    throw new ReflectionException(e.getMessage(), e);
-                }
-            }
-            option = new Option<Field>(field);
-            Option<Field> exist = options.putIfAbsent(name, option);
-            if (exist != null) {
-                option = exist;
-            }
-
-        }
-        return option.get();
-    }
 
     /**
      * 解析表达式，获取属性值

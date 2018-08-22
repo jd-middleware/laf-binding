@@ -6,7 +6,7 @@ import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.ArraySuppliers;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 import com.jd.laf.binding.util.Collections;
-import com.jd.laf.binding.util.Generics;
+import com.jd.laf.binding.reflect.Generics;
 
 import java.util.Collection;
 

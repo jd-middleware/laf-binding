@@ -27,6 +27,8 @@ public interface ConverterSupplier {
 
     int COLLECTION_TO_COLLECTION_ORDER = 99;
 
+    int MAP_TO_OBJECT_ORDER = 50;
+
     /**
      * 获取转换操作
      *

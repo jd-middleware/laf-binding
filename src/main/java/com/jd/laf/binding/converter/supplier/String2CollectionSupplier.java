@@ -7,7 +7,7 @@ import com.jd.laf.binding.util.Collections;
 import java.util.Collection;
 import java.util.List;
 
-import static com.jd.laf.binding.util.Generics.getGenericType;
+import static com.jd.laf.binding.reflect.Generics.getGenericType;
 import static com.jd.laf.binding.util.Primitive.inbox;
 import static com.jd.laf.binding.util.Strings.split;
 
