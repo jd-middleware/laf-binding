@@ -71,7 +71,6 @@ public class BindingTest {
         Assert.assertEquals(employee.age, 10);
     }
 
-    @Test
     public void testBindPerformance() throws ReflectionException {
         Map<String, Object> context = createContext();
         Employee employee = new Employee();
