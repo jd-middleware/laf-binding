@@ -8,7 +8,6 @@ import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.Reflect;
 import com.jd.laf.binding.reflect.ReflectAccessorFactory;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
-import com.jd.laf.binding.util.SuperClassIterator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -19,6 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.jd.laf.binding.binder.Binders.getBinder;
 import static com.jd.laf.binding.reflect.Fields.getField;
+import static com.jd.laf.binding.reflect.Fields.getFields;
 
 /**
  * 绑定器
@@ -116,15 +116,11 @@ public class Binding {
         if (bindings == null) {
             // 没有找到则从注解中查找
             bindings = new ArrayList<BindingField>();
-            Field[] fields;
             Annotation[] annotations;
             BindingField bindingField;
             Binder binder;
-            SuperClassIterator iterator = new SuperClassIterator(clazz);
-            while (iterator.hasNext()) {
-                clazz = iterator.next();
-                //所有声明的字段
-                fields = clazz.getDeclaredFields();
+            List<Field> fields = getFields(clazz);
+            if (fields != null) {
                 //遍历字段
                 for (Field field : fields) {
                     bindingField = null;

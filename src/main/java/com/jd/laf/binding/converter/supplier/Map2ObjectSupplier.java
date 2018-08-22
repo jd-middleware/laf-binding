@@ -52,7 +52,7 @@ public class Map2ObjectSupplier implements ConverterSupplier {
             Object obj = constructor.newInstance();
             Object key;
             Field field;
-            Map<String, Field> fields = Fields.getFields(targetType);
+            Map<String, Field> fields = Fields.getNames(targetType);
             if (!fields.isEmpty()) {
                 for (Map.Entry<?, ?> entry : ((Map<?, ?>) conversion.getSource()).entrySet()) {
                     key = entry.getKey();
