@@ -106,4 +106,11 @@ public class ReflectAccessor implements FieldAccessor {
         }
     }
 
+    public Method getGetter() {
+        return getter;
+    }
+
+    public Method getSetter() {
+        return setter;
+    }
 }
