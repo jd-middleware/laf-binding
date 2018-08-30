@@ -88,6 +88,17 @@ public class Binding {
     }
 
     /**
+     * 是否支持类型转换
+     *
+     * @param source
+     * @param target
+     * @return
+     */
+    public static boolean support(final Class<?> source, final Class<?> target) {
+        return Reflect.support(source, target);
+    }
+
+    /**
      * 绑定上下文
      *
      * @param source 上下文

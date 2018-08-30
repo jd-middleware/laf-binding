@@ -208,4 +208,20 @@ public abstract class Reflect {
         }
     }
 
+    /**
+     * 是否支持类型转换
+     *
+     * @param source
+     * @param target
+     * @return
+     */
+    public static boolean support(final Class<?> source, final Class<?> target) {
+        if (source == null || target == null) {
+            return false;
+        }
+        //获取转换器
+        Operation operation = getOperation(inbox(source), inbox(target));
+        return operation != null;
+    }
+
 }
