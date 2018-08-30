@@ -5,6 +5,7 @@ import com.jd.laf.binding.converter.supplier.ConverterSupplier.Operation;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import static com.jd.laf.binding.converter.Converters.getOperation;
 import static com.jd.laf.binding.reflect.Fields.getField;
@@ -173,7 +174,7 @@ public abstract class Reflect {
      */
     public static boolean set(final Object target, final Field field, final Object value, final Object format,
                               final FieldAccessor accessor) throws ReflectionException {
-        if (field == null || target == null || accessor == null) {
+        if (field == null || target == null || accessor == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
         try {

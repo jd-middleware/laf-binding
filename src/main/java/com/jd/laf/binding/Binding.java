@@ -11,6 +11,7 @@ import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -134,6 +135,9 @@ public class Binding {
             if (fields != null) {
                 //遍历字段
                 for (Field field : fields) {
+                    if (Modifier.isFinal(field.getModifiers())) {
+                        continue;
+                    }
                     bindingField = null;
                     //遍历注解
                     annotations = field.getAnnotations();
