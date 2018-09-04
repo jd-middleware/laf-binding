@@ -50,7 +50,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
                 return conversion.getSource();
             }
             //获取转换器
-            Operation componentOperation = Converters.getOperation(inboxSourceComponentType, inboxTargetComponentType);
+            Operation componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
             //用原始元素类型构建数组
             ArraySupplier srcArraySupplier = getArraySupplier(sourceComponentType);
             //构建数组
@@ -83,7 +83,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
                         inboxSourceElementType = inbox(element.getClass());
                         //如果类型有变更，则根据实际类型获取转换器
                         op = inboxSourceElementType.equals(lastInboxSourceElementType) ? op :
-                                Converters.getOperation(inboxSourceElementType, inboxTargetComponentType);
+                                Converters.getPlugin(inboxSourceElementType, inboxTargetComponentType);
                         if (op == null) {
                             return null;
                         }

@@ -43,7 +43,7 @@ public class String2CollectionSupplier implements ConverterSupplier {
             if (inboxTargetComponentType == null) {
                 return null;
             }
-            Operation operation = Converters.getOperation(String.class, inboxTargetComponentType);
+            Operation operation = Converters.getPlugin(String.class, inboxTargetComponentType);
             if (operation == null) {
                 return null;
             }

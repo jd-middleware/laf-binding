@@ -34,7 +34,7 @@ public abstract class Converters {
      * @param targetType 目标类型
      * @return 转换操作
      */
-    public static Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
+    public static Operation getPlugin(final Class<?> sourceType, final Class<?> targetType) {
         if (sourceType == null || targetType == null) {
             return null;
         } else if (targetType == sourceType || targetType.isAssignableFrom(sourceType)) {
@@ -89,7 +89,6 @@ public abstract class Converters {
         }
         return option.get();
     }
-
 
 
 }

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.jd.laf.binding.binder.Binders.getBinder;
+import static com.jd.laf.binding.binder.Binders.getPlugin;
 import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.reflect.Fields.getFields;
 
@@ -143,7 +143,7 @@ public class Binding {
                     annotations = field.getAnnotations();
                     for (Annotation annotation : annotations) {
                         //是否是绑定注解
-                        binder = getBinder(annotation.annotationType());
+                        binder = getPlugin(annotation.annotationType());
                         if (binder != null) {
                             if (bindingField == null) {
                                 bindingField = new BindingField(field, factory.getAccessor(field));

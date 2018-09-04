@@ -1,15 +1,15 @@
 package com.jd.laf.binding.reflect;
 
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.Converters;
 import com.jd.laf.binding.converter.supplier.ConverterSupplier.Operation;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import static com.jd.laf.binding.converter.Converters.getOperation;
 import static com.jd.laf.binding.reflect.Fields.getField;
-import static com.jd.laf.binding.reflect.PropertyGetters.getPropertyGetter;
+import static com.jd.laf.binding.reflect.PropertySuppliers.getPlugin;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
@@ -77,7 +77,7 @@ public abstract class Reflect {
         if (target == null || name == null || name.isEmpty() || factory == null) {
             return null;
         }
-        PropertyGetter getter = getPropertyGetter(target.getClass());
+        PropertySupplier getter = getPlugin(target.getClass());
         try {
             Object result = getter == null ? null : getter.get(target, name);
             if (result == null && Character.isJavaIdentifierStart(name.charAt(0))) {
@@ -191,7 +191,7 @@ public abstract class Reflect {
             Class<?> inboxTargetType = inbox(field.getType());
             Class<?> inboxSourceType = inbox(value.getClass());
             //获取转换器
-            Operation operation = getOperation(inboxSourceType, inboxTargetType);
+            Operation operation = Converters.getPlugin(inboxSourceType, inboxTargetType);
             if (operation != null) {
                 //拿到转换器
                 Object obj = operation.execute(new Conversion(inboxSourceType, inboxTargetType, value, format, field));
@@ -221,7 +221,7 @@ public abstract class Reflect {
             return false;
         }
         //获取转换器
-        Operation operation = getOperation(inbox(source), inbox(target));
+        Operation operation = Converters.getPlugin(inbox(source), inbox(target));
         return operation != null;
     }
 

@@ -40,7 +40,7 @@ public class String2ArraySupplier implements ConverterSupplier {
         public Object execute(final Conversion conversion) throws Exception {
             Class<?> targetElementType = conversion.getTargetType().getComponentType();
             Class<?> inboxElementType = inbox(targetElementType);
-            Operation operation = Converters.getOperation(String.class, inboxElementType);
+            Operation operation = Converters.getPlugin(String.class, inboxElementType);
             if (operation == null) {
                 return null;
             }

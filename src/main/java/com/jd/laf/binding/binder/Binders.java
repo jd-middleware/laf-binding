@@ -18,7 +18,7 @@ public abstract class Binders {
      * @param clazz 类型
      * @return
      */
-    public static Binder getBinder(final Class<?> clazz) {
+    public static Binder getPlugin(final Class<?> clazz) {
         if (clazz == null) {
             return null;
         }

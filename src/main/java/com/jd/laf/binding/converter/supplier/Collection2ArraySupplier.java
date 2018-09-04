@@ -62,7 +62,7 @@ public class Collection2ArraySupplier implements ConverterSupplier {
                 } else {
                     inboxSourceComponentType = inbox(v.getClass());
                     operation = inboxSourceComponentType.equals(lastInboxSourceComponentType) ? operation :
-                            Converters.getOperation(inboxSourceComponentType, inboxTargetComponentType);
+                            Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
                     obj = operation.execute(new Conversion(inboxSourceComponentType, inboxTargetComponentType, v, format));
                     if (obj == null) {
                         return false;

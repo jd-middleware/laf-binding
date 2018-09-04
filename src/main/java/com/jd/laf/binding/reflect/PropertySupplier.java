@@ -3,7 +3,7 @@ package com.jd.laf.binding.reflect;
 /**
  * 属性获取器
  */
-public interface PropertyGetter {
+public interface PropertySupplier {
 
     /**
      * 获取属性值

@@ -56,7 +56,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
                 //不支持的集合类型
                 return null;
             }
-            Operation componentOperation = Converters.getOperation(inboxSourceComponentType, inboxTargetComponentType);
+            Operation componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
             Object obj;
             Object element;
             Operation op = null;
@@ -82,7 +82,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
                         inboxSourceElementType = inbox(element.getClass());
                         //如果类型有变更，则根据实际类型获取转换器
                         op = inboxSourceElementType.equals(lastInboxSourceElementType) ? op :
-                                Converters.getOperation(inboxSourceElementType, inboxTargetComponentType);
+                                Converters.getPlugin(inboxSourceElementType, inboxTargetComponentType);
                         if (op == null) {
                             return null;
                         }

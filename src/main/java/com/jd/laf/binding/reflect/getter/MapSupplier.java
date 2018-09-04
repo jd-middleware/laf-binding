@@ -1,13 +1,13 @@
 package com.jd.laf.binding.reflect.getter;
 
-import com.jd.laf.binding.reflect.PropertyGetter;
+import com.jd.laf.binding.reflect.PropertySupplier;
 
 import java.util.Map;
 
 /**
  * MAP属性获取器
  */
-public class MapGetter implements PropertyGetter {
+public class MapSupplier implements PropertySupplier {
 
     @Override
     public Object get(final Object target, final String name) {
