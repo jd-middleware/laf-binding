@@ -1,26 +1,60 @@
 package com.jd.laf.binding.marshaller;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * XML提供者
  */
 public class JaxbProvider implements XmlProvider {
 
-    protected static final JaxbUnmarshaller INSTANCE = new JaxbUnmarshaller();
+    protected static final ConcurrentMap<Class, JAXBContext> contexts = new ConcurrentHashMap<Class, JAXBContext>();
 
     @Override
     public Unmarshaller getUnmarshaller() {
-        return INSTANCE;
+        return JaxbUnmarshaller.INSTANCE;
+    }
+
+    @Override
+    public Marshaller getMarshaller() {
+        return JaxbMarshaller.INSTANCE;
+    }
+
+    /**
+     * 获取JAXB上下文
+     *
+     * @param clazz
+     * @return
+     * @throws JAXBException
+     */
+    protected static JAXBContext getJaxbContext(final Class clazz) throws JAXBException {
+        if (clazz == null) {
+            return null;
+        }
+        JAXBContext context = contexts.get(clazz);
+        if (context == null) {
+            context = JAXBContext.newInstance(clazz);
+            JAXBContext exists = contexts.putIfAbsent(clazz, context);
+            if (exists != null) {
+                context = exists;
+            }
+        }
+        return context;
     }
 
     /**
      * jaxb反序列化
      */
     protected static class JaxbUnmarshaller implements Unmarshaller {
+
+        public static final Unmarshaller INSTANCE = new JaxbUnmarshaller();
+
         @Override
         public <T> T unmarshall(String value, Class<T> clazz, String format) throws Exception {
             if (value == null || value.isEmpty()) {
@@ -30,9 +64,30 @@ public class JaxbProvider implements XmlProvider {
             if (annotation == null) {
                 return null;
             }
-            JAXBContext context = JAXBContext.newInstance(clazz);
+            JAXBContext context = getJaxbContext(clazz);
             javax.xml.bind.Unmarshaller marshaller = context.createUnmarshaller();
             return (T) marshaller.unmarshal(new StringReader(value));
+        }
+    }
+
+
+    /**
+     * jaxb反序列化
+     */
+    protected static class JaxbMarshaller implements Marshaller {
+
+        protected static final Marshaller INSTANCE = new JaxbMarshaller();
+
+        @Override
+        public String marshall(final Object target) throws Exception {
+            if (target == null) {
+                return null;
+            }
+            JAXBContext context = getJaxbContext(target.getClass());
+            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+            StringWriter writer = new StringWriter();
+            marshaller.marshal(target, writer);
+            return writer.toString();
         }
     }
 }
