@@ -29,6 +29,7 @@ public class BindingTest {
         Assert.assertEquals(employee.getMyIds().length, 3);
         Assert.assertEquals(employee.getIdSet().size(), 3);
         Assert.assertEquals(employee.getToken(), "123");
+        Assert.assertEquals(employee.getIds1(),"1,2,3");
 
     }
 
@@ -133,6 +134,8 @@ public class BindingTest {
         private SortedSet<Integer> idSet;
         @Value(nullable = false)
         private String token = "123";
+        @Value("ids1")
+        private String ids1;
 
         public String getName() {
             return name;
@@ -252,6 +255,14 @@ public class BindingTest {
 
         public void setToken(String token) {
             this.token = token;
+        }
+
+        public String getIds1() {
+            return ids1;
+        }
+
+        public void setIds1(String ids1) {
+            this.ids1 = ids1;
         }
     }
 
