@@ -12,3 +12,6 @@ com.jd.laf.binding.converter.AtomicBooleanConverter
 com.jd.laf.binding.converter.AtomicIntegerConverter
 com.jd.laf.binding.converter.AtomicLongConverter
 com.jd.laf.binding.converter.ClassConverter
+com.jd.laf.binding.converter.FileConverter
+com.jd.laf.binding.converter.URIConverter
+com.jd.laf.binding.converter.URLConverter
