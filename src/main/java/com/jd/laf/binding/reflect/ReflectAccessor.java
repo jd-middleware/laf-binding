@@ -95,11 +95,9 @@ public class ReflectAccessor implements FieldAccessor {
                 field.set(target, value);
             } else {
                 field.setAccessible(true);
-                try {
-                    field.set(target, value);
-                } finally {
-                    field.setAccessible(false);
-                }
+                field.set(target, value);
+                //多线程有问题
+                //field.setAccessible(false);
             }
         } catch (Exception e) {
             throw new ReflectionException(e.getMessage(), e);
