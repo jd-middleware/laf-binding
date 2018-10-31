@@ -56,7 +56,12 @@ public class JaxbProvider implements XmlProvider {
         public static final Unmarshaller INSTANCE = new JaxbUnmarshaller();
 
         @Override
-        public <T> T unmarshall(String value, Class<T> clazz, String format) throws Exception {
+        public <T> T unmarshall(final String value, final Class<T> clazz, final String format) throws Exception {
+            return unmarshall(value, clazz);
+        }
+
+        @Override
+        public <T> T unmarshall(final String value, final Class<T> clazz) throws Exception {
             if (value == null || value.isEmpty()) {
                 return null;
             }
