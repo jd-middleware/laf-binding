@@ -36,10 +36,11 @@ public class Binding {
      * @param target 目标对象
      * @param field  字段名称
      * @param value  字段值
+     * @return 成功标识
      * @throws ReflectionException
      */
-    public static void set(final Object target, final String field, final Object value) throws ReflectionException {
-        set(target, field, value, ReflectAccessorFactory.getInstance());
+    public static boolean set(final Object target, final String field, final Object value) throws ReflectionException {
+        return set(target, field, value, ReflectAccessorFactory.getInstance());
     }
 
     /**
@@ -49,14 +50,15 @@ public class Binding {
      * @param field   字段名称
      * @param value   字段值
      * @param factory 字段访问对象工厂
+     * @return 成功标识
      * @throws ReflectionException
      */
-    public static void set(final Object target, final String field, final Object value,
-                           final FieldAccessorFactory factory) throws ReflectionException {
+    public static boolean set(final Object target, final String field, final Object value,
+                              final FieldAccessorFactory factory) throws ReflectionException {
         if (field == null || target == null || factory == null) {
-            return;
+            return false;
         }
-        set(target, getField(target.getClass(), field), value, factory);
+        return set(target, getField(target.getClass(), field), value, factory);
     }
 
     /**
@@ -65,10 +67,11 @@ public class Binding {
      * @param target 目标对象
      * @param field  字段
      * @param value  字段值
+     * @return 成功标识
      * @throws ReflectionException
      */
-    public static void set(final Object target, final Field field, final Object value) throws ReflectionException {
-        set(target, field, value, ReflectAccessorFactory.getInstance());
+    public static boolean set(final Object target, final Field field, final Object value) throws ReflectionException {
+        return set(target, field, value, ReflectAccessorFactory.getInstance());
     }
 
     /**
@@ -78,14 +81,15 @@ public class Binding {
      * @param field   字段
      * @param value   字段值
      * @param factory 字段访问对象工厂
+     * @return 成功标识
      * @throws ReflectionException
      */
-    public static void set(final Object target, final Field field, final Object value,
-                           final FieldAccessorFactory factory) throws ReflectionException {
+    public static boolean set(final Object target, final Field field, final Object value,
+                              final FieldAccessorFactory factory) throws ReflectionException {
         if (field == null || factory == null) {
-            return;
+            return false;
         }
-        Reflect.set(target, field, value, factory);
+        return Reflect.set(target, field, value, factory);
     }
 
     /**
