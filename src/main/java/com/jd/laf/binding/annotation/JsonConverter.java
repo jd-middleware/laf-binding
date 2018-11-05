@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * 绑定上下文
  * Created by hexiaofeng on 15-7-20.
  */
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.FIELD, ElementType.METHOD ,ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsonConverter {
 
