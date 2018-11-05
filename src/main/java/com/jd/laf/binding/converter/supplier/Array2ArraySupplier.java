@@ -1,6 +1,8 @@
 package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
 import com.jd.laf.binding.converter.Converters;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
@@ -14,8 +16,8 @@ import static com.jd.laf.binding.util.Primitive.inbox;
 public class Array2ArraySupplier implements ConverterSupplier {
 
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (targetType.isArray() && sourceType.isArray()) {
+    public Converter getConverter(final ConversionType type) {
+        if (type.getTargetType().isArray() && type.getSourceType().isArray()) {
             return Array2ArrayOperation.INSTANCE;
         }
         return null;
@@ -29,9 +31,9 @@ public class Array2ArraySupplier implements ConverterSupplier {
     /**
      * 构造函数操作
      */
-    protected static final class Array2ArrayOperation implements Operation {
+    protected static final class Array2ArrayOperation implements Converter {
 
-        protected static final Operation INSTANCE = new Array2ArrayOperation();
+        protected static final Converter INSTANCE = new Array2ArrayOperation();
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
@@ -50,7 +52,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
                 return conversion.getSource();
             }
             //获取转换器
-            Operation componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
+            Converter componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
             //用原始元素类型构建数组
             ArraySupplier srcArraySupplier = getArraySupplier(sourceComponentType);
             //构建数组
@@ -62,7 +64,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
             Object obj;
             Object element;
             Class<?> inboxSourceElementType, lastInboxSourceElementType = null;
-            Operation op = null;
+            Converter op = null;
             //遍历数组
             for (int i = 0; i < size; i++) {
                 element = srcArray.get(i);

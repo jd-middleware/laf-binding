@@ -3,10 +3,10 @@ package com.jd.laf.binding.converter;
 /**
  * 字符转换器
  */
-public class CharConverter implements Converter {
+public class CharConverter implements SimpleConverter {
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null || conversion.source == null) {
             return null;
         }

@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * 时间转换器
  */
-public class DateConverter implements Converter {
+public class DateConverter implements SimpleConverter {
 
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static final String YYYY_MM_DD = "yyyy-MM-dd";
@@ -46,7 +46,7 @@ public class DateConverter implements Converter {
     }
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null || conversion.source == null) {
             return null;
         } else if (conversion.source instanceof Calendar) {

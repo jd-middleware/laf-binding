@@ -6,10 +6,10 @@ import java.net.URISyntaxException;
 /**
  * URI转换器
  */
-public class URIConverter implements Converter {
+public class URIConverter implements SimpleConverter {
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null) {
             return null;
         }

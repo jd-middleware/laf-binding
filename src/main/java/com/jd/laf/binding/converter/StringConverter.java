@@ -6,10 +6,10 @@ import java.util.Collection;
 /**
  * 字符串转换器
  */
-public class StringConverter implements Converter {
+public class StringConverter implements SimpleConverter {
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null) {
             return null;
         }

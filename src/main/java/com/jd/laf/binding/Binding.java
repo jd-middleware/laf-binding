@@ -3,6 +3,7 @@ package com.jd.laf.binding;
 
 import com.jd.laf.binding.binder.Binder;
 import com.jd.laf.binding.binder.Binder.Context;
+import com.jd.laf.binding.converter.Scope;
 import com.jd.laf.binding.reflect.FieldAccessor;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.Reflect;
@@ -101,6 +102,18 @@ public class Binding {
      */
     public static boolean support(final Class<?> source, final Class<?> target) {
         return Reflect.support(source, target);
+    }
+
+    /**
+     * 在指定作用域上是否支持类型转换，支持作用域上的转换注解
+     *
+     * @param source 源类型
+     * @param target 目标类型
+     * @param scope  作用域
+     * @return
+     */
+    public static boolean support(final Class<?> source, final Class<?> target, final Scope scope) {
+        return Reflect.support(source, target, scope);
     }
 
     /**

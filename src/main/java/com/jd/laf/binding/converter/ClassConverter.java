@@ -5,10 +5,10 @@ import com.jd.laf.binding.reflect.Classes;
 /**
  * 类转换器
  */
-public class ClassConverter implements Converter {
+public class ClassConverter implements SimpleConverter {
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null) {
             return null;
         }

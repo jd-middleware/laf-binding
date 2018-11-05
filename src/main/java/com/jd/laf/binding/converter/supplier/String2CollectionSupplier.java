@@ -1,6 +1,8 @@
 package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
 import com.jd.laf.binding.converter.Converters;
 import com.jd.laf.binding.util.Collections;
 
@@ -18,8 +20,8 @@ public class String2CollectionSupplier implements ConverterSupplier {
 
 
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (Collection.class.isAssignableFrom(targetType) && CharSequence.class.isAssignableFrom(sourceType)) {
+    public Converter getConverter(final ConversionType type) {
+        if (Collection.class.isAssignableFrom(type.getTargetType()) && CharSequence.class.isAssignableFrom(type.getSourceType())) {
             return String2CollectionOperation.INSTANCE;
         }
         return null;
@@ -33,17 +35,17 @@ public class String2CollectionSupplier implements ConverterSupplier {
     /**
      * 构造函数操作
      */
-    protected static final class String2CollectionOperation implements Operation {
+    protected static final class String2CollectionOperation implements Converter {
 
-        protected static final Operation INSTANCE = new String2CollectionOperation();
+        protected static final Converter INSTANCE = new String2CollectionOperation();
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            Class<?> inboxTargetComponentType = inbox(getGenericType(conversion.getField()));
+            Class<?> inboxTargetComponentType = inbox(conversion.getScope().getGenericType());
             if (inboxTargetComponentType == null) {
                 return null;
             }
-            Operation operation = Converters.getPlugin(String.class, inboxTargetComponentType);
+            Converter operation = Converters.getPlugin(String.class, inboxTargetComponentType);
             if (operation == null) {
                 return null;
             }

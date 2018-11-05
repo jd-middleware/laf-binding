@@ -1,6 +1,8 @@
 package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
 import com.jd.laf.binding.reflect.Fields;
 import com.jd.laf.binding.reflect.Reflect;
 
@@ -15,8 +17,9 @@ import static com.jd.laf.binding.reflect.Constructors.getDefaultConstructor;
 public class Map2ObjectSupplier implements ConverterSupplier {
 
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (!Map.class.isAssignableFrom(sourceType)
+    public Converter getConverter(final ConversionType type) {
+        Class targetType = type.getTargetType();
+        if (!Map.class.isAssignableFrom(type.getSourceType())
                 || Object.class.equals(targetType)
                 || Map.class.isAssignableFrom(targetType)
                 || Collection.class.isAssignableFrom(targetType)
@@ -38,9 +41,9 @@ public class Map2ObjectSupplier implements ConverterSupplier {
     /**
      * MAP转换成对象操作
      */
-    protected static class Map2ObjectOperation implements Operation {
+    protected static class Map2ObjectOperation implements Converter {
 
-        protected static final Operation INSTANCE = new Map2ObjectOperation();
+        protected static final Converter INSTANCE = new Map2ObjectOperation();
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {

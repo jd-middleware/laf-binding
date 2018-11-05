@@ -1,8 +1,7 @@
 package com.jd.laf.binding.reflect;
 
-import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.Converters;
-import com.jd.laf.binding.converter.supplier.ConverterSupplier.Operation;
+import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Scope.FieldScope;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.Field;
@@ -190,11 +189,12 @@ public abstract class Reflect {
             }
             Class<?> inboxTargetType = inbox(field.getType());
             Class<?> inboxSourceType = inbox(value.getClass());
+            FieldScope scope = new FieldScope(field);
             //获取转换器
-            Operation operation = Converters.getPlugin(inboxSourceType, inboxTargetType);
+            Converter operation = Converters.getPlugin(new ConversionType(inboxSourceType, inboxTargetType, scope));
             if (operation != null) {
                 //拿到转换器
-                Object obj = operation.execute(new Conversion(inboxSourceType, inboxTargetType, value, format, field));
+                Object obj = operation.execute(new Conversion(inboxSourceType, inboxTargetType, value, format, scope));
                 if (obj != null) {
                     //转换成功
                     accessor.set(target, obj);
@@ -221,8 +221,22 @@ public abstract class Reflect {
             return false;
         }
         //获取转换器
-        Operation operation = Converters.getPlugin(inbox(source), inbox(target));
-        return operation != null;
+        return Converters.getPlugin(inbox(source), inbox(target)) != null;
+    }
+
+    /**
+     * 在作用域上是否支持类型转换，支持作用域上的转换注解
+     *
+     * @param source 源类型
+     * @param target 目标类型
+     * @param scope  作用域
+     * @return
+     */
+    public static boolean support(final Class<?> source, final Class<?> target, final Scope scope) {
+        if (source == null || target == null) {
+            return false;
+        }
+        return Converters.getPlugin(new ConversionType(inbox(source), inbox(target), scope)) != null;
     }
 
 }

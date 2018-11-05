@@ -3,7 +3,6 @@ package com.jd.laf.binding.converter;
 
 import com.jd.laf.binding.Option;
 import com.jd.laf.binding.converter.supplier.ConverterSupplier;
-import com.jd.laf.binding.converter.supplier.ConverterSupplier.Operation;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,10 +16,10 @@ public abstract class Converters {
 
     //转换器
     protected static volatile List<ConverterSupplier> plugins;
-    protected static final ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Operation>>> operations =
-            new ConcurrentHashMap<Class<?>, ConcurrentMap<Class<?>, Option<Operation>>>();
+    protected static final ConcurrentMap<ConversionType, Option<Converter>> operations =
+            new ConcurrentHashMap<ConversionType, Option<Converter>>();
     //不做转换
-    protected static final Operation NONE = new Operation() {
+    protected static final Converter NONE = new Converter() {
         @Override
         public Object execute(Conversion conversion) throws Exception {
             return conversion.source;
@@ -34,10 +33,20 @@ public abstract class Converters {
      * @param targetType 目标类型
      * @return 转换操作
      */
-    public static Operation getPlugin(final Class<?> sourceType, final Class<?> targetType) {
-        if (sourceType == null || targetType == null) {
+    public static Converter getPlugin(final Class<?> sourceType, final Class<?> targetType) {
+        return getPlugin(new ConversionType(sourceType, targetType));
+    }
+
+    /**
+     * 获取转换操作
+     *
+     * @param type 转换类型
+     * @return 转换操作
+     */
+    public static Converter getPlugin(final ConversionType type) {
+        if (type == null) {
             return null;
-        } else if (targetType == sourceType || targetType.isAssignableFrom(sourceType)) {
+        } else if (type.getTargetType() == type.getSourceType() || type.getTargetType().isAssignableFrom(type.getSourceType())) {
             //可以直接赋值
             return NONE;
         } else if (plugins == null) {
@@ -62,27 +71,19 @@ public abstract class Converters {
         }
 
         //判断是否有转化器
-        ConcurrentMap<Class<?>, Option<Operation>> options = operations.get(targetType);
-        if (options == null) {
-            options = new ConcurrentHashMap<Class<?>, Option<Operation>>();
-            ConcurrentMap<Class<?>, Option<Operation>> exists = operations.putIfAbsent(targetType, options);
-            if (exists != null) {
-                options = exists;
-            }
-        }
-        Option<Operation> option = options.get(sourceType);
+        Option<Converter> option = operations.get(type);
         if (option == null) {
             //没有缓存，则重新计算
-            Operation operation = null;
-            for (ConverterSupplier converter : plugins) {
-                operation = converter.getOperation(sourceType, targetType);
+            Converter operation = null;
+            for (ConverterSupplier plugin : plugins) {
+                operation = plugin.getConverter(type);
                 if (operation != null) {
                     break;
                 }
             }
-            option = new Option<Operation>(operation);
+            option = new Option<Converter>(operation);
             //缓存
-            Option<Operation> exists = options.putIfAbsent(sourceType, option);
+            Option<Converter> exists = operations.putIfAbsent(type, option);
             if (exists != null) {
                 option = exists;
             }

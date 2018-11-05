@@ -2,6 +2,8 @@ package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.Option;
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -26,10 +28,10 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
 
 
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
+    public Converter getConverter(final ConversionType type) {
         // 判断是否有构造函数
-        Method method = getMethod(targetType, sourceType, methodName, getCache());
-        return method == null ? null : new MethodOperation(method);
+        Method method = getMethod(type.getTargetType(), type.getSourceType(), methodName, getCache());
+        return method == null ? null : new MethodConverter(method);
     }
 
     protected abstract ConcurrentMap<Class<?>, ConcurrentMap<Class<?>, Option<Method>>> getCache();
@@ -91,11 +93,11 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
     /**
      * 构造函数操作
      */
-    protected static final class MethodOperation implements Operation {
+    protected static final class MethodConverter implements Converter {
 
         protected final Method method;
 
-        public MethodOperation(Method method) {
+        public MethodConverter(Method method) {
             this.method = method;
         }
 

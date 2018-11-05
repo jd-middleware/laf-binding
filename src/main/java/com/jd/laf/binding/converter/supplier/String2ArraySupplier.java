@@ -1,7 +1,6 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.Converters;
+import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.ArraySuppliers;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
@@ -17,8 +16,8 @@ import static com.jd.laf.binding.util.Strings.split;
 public class String2ArraySupplier implements ConverterSupplier {
 
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (targetType.isArray() && CharSequence.class.isAssignableFrom(sourceType)) {
+    public Converter getConverter(final ConversionType type) {
+        if (type.getTargetType().isArray() && CharSequence.class.isAssignableFrom(type.getSourceType())) {
             return String2ArrayOperation.INSTANCE;
         }
         return null;
@@ -32,15 +31,15 @@ public class String2ArraySupplier implements ConverterSupplier {
     /**
      * 构造函数操作
      */
-    protected static final class String2ArrayOperation implements Operation {
+    protected static final class String2ArrayOperation implements Converter {
 
-        protected static final Operation INSTANCE = new String2ArrayOperation();
+        protected static final Converter INSTANCE = new String2ArrayOperation();
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
             Class<?> targetElementType = conversion.getTargetType().getComponentType();
             Class<?> inboxElementType = inbox(targetElementType);
-            Operation operation = Converters.getPlugin(String.class, inboxElementType);
+            Converter operation = Converters.getPlugin(String.class, inboxElementType);
             if (operation == null) {
                 return null;
             }

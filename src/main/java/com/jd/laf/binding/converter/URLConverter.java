@@ -6,10 +6,10 @@ import java.net.URL;
 /**
  * URL转换器
  */
-public class URLConverter implements Converter {
+public class URLConverter implements SimpleConverter {
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null) {
             return null;
         }

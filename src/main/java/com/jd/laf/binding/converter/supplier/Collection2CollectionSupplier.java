@@ -1,9 +1,10 @@
 package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
 import com.jd.laf.binding.converter.Converters;
 import com.jd.laf.binding.util.Collections;
-import com.jd.laf.binding.reflect.Generics;
 
 import java.util.Collection;
 
@@ -16,8 +17,8 @@ public class Collection2CollectionSupplier implements ConverterSupplier {
 
 
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (Collection.class.isAssignableFrom(targetType) && Collection.class.isAssignableFrom(sourceType)) {
+    public Converter getConverter(final ConversionType type) {
+        if (Collection.class.isAssignableFrom(type.getTargetType()) && Collection.class.isAssignableFrom(type.getSourceType())) {
             return Collection2CollectionOperation.INSTANCE;
         }
         return null;
@@ -31,15 +32,15 @@ public class Collection2CollectionSupplier implements ConverterSupplier {
     /**
      * 构造函数操作
      */
-    protected static final class Collection2CollectionOperation implements Operation {
+    protected static final class Collection2CollectionOperation implements Converter {
 
-        protected static final Operation INSTANCE = new Collection2CollectionOperation();
+        protected static final Converter INSTANCE = new Collection2CollectionOperation();
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
 
             //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> inboxTargetComponentType = inbox(Generics.getGenericType(conversion.getField()));
+            Class<?> inboxTargetComponentType = inbox(conversion.getScope().getGenericType());
             if (inboxTargetComponentType == null) {
                 return null;
             }
@@ -52,7 +53,7 @@ public class Collection2CollectionSupplier implements ConverterSupplier {
             }
             Object format = conversion.getFormat();
             Class<?> inboxSourceComponentType, lastInboxSourceComponentType = null;
-            Operation operation = null;
+            Converter operation = null;
             Object obj;
             for (Object v : value) {
                 if (v == null) {

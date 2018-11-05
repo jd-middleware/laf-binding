@@ -1,12 +1,13 @@
 package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
 import com.jd.laf.binding.converter.Converters;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.ArraySuppliers;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 import com.jd.laf.binding.util.Collections;
-import com.jd.laf.binding.reflect.Generics;
 
 import java.util.Collection;
 
@@ -18,8 +19,8 @@ import static com.jd.laf.binding.util.Primitive.inbox;
 public class Array2CollectionSupplier implements ConverterSupplier {
 
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (Collection.class.isAssignableFrom(targetType) && sourceType.isArray()) {
+    public Converter getConverter(final ConversionType type) {
+        if (Collection.class.isAssignableFrom(type.getTargetType()) && type.getSourceType().isArray()) {
             return Array2CollectionOperation.INSTANCE;
         }
         return null;
@@ -33,14 +34,14 @@ public class Array2CollectionSupplier implements ConverterSupplier {
     /**
      * 构造函数操作
      */
-    protected static final class Array2CollectionOperation implements Operation {
+    protected static final class Array2CollectionOperation implements Converter {
 
-        protected static final Operation INSTANCE = new Array2CollectionOperation();
+        protected static final Converter INSTANCE = new Array2CollectionOperation();
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
             //获取字段泛型
-            Class<?> inboxTargetComponentType = inbox(Generics.getGenericType(conversion.getField()));
+            Class<?> inboxTargetComponentType = inbox(conversion.getScope().getGenericType());
             if (inboxTargetComponentType == null) {
                 return null;
             }
@@ -56,10 +57,10 @@ public class Array2CollectionSupplier implements ConverterSupplier {
                 //不支持的集合类型
                 return null;
             }
-            Operation componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
+            Converter componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
             Object obj;
             Object element;
-            Operation op = null;
+            Converter op = null;
             Class<?> inboxSourceElementType, lastInboxSourceElementType = null;
             //遍历数组
             for (int i = 0; i < size; i++) {

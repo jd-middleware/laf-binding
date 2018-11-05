@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AtomicLongConverter extends NumberConverter {
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null || conversion.source == null) {
             return null;
         } else if (conversion.source instanceof Number) {

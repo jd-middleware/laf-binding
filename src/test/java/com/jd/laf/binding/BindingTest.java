@@ -1,16 +1,24 @@
 package com.jd.laf.binding;
 
+import com.jd.laf.binding.annotation.JsonConverter;
 import com.jd.laf.binding.annotation.Value;
+import com.jd.laf.binding.annotation.XmlConverter;
+import com.jd.laf.binding.marshaller.XmlProviders;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.*;
 
 public class BindingTest {
 
     @Test
-    public void testMapBinding() throws ReflectionException {
+    public void testMapBinding() throws Exception {
+
         Map<String, Object> context = createContext();
         Employee employee = new Employee();
         bind(employee, context);
@@ -49,7 +57,7 @@ public class BindingTest {
         context.put("height1", 500);
         context.put("birthDay", "1970-01-01");
         context.put("company", new Company("testss"));
-        context.put("company1", company);
+        context.put("company1", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><company name=\"name1\"/>");
         context.put("sex", "MALE");
         context.put("ids", Arrays.asList("1", "2", "3"));
         context.put("ids1", new String[]{"1", "2", "3"});
@@ -84,7 +92,10 @@ public class BindingTest {
         System.out.println(count * 1000 / time);
     }
 
+    @XmlRootElement
+    @XmlAccessorType(XmlAccessType.NONE)
     public static class Company {
+        @XmlAttribute
         private String name;
 
         public Company() {
@@ -121,6 +132,7 @@ public class BindingTest {
         @Value("company.name")
         private String company;
         @Value
+        @XmlConverter
         private Company company1;
         @Value
         private Sex sex;
@@ -281,4 +293,5 @@ public class BindingTest {
         }
 
     }
+
 }

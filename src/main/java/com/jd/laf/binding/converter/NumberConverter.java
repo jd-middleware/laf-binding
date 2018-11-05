@@ -3,7 +3,7 @@ package com.jd.laf.binding.converter;
 /**
  * 数值转换器
  */
-public abstract class NumberConverter implements Converter {
+public abstract class NumberConverter implements SimpleConverter {
 
     @Override
     public boolean support(final Class<?> type) {

@@ -1,6 +1,8 @@
 package com.jd.laf.binding.converter.supplier;
 
 import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
 import com.jd.laf.binding.converter.Converters;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
@@ -15,10 +17,9 @@ import static com.jd.laf.binding.util.Primitive.inbox;
  */
 public class Collection2ArraySupplier implements ConverterSupplier {
 
-
     @Override
-    public Operation getOperation(final Class<?> sourceType, final Class<?> targetType) {
-        if (targetType.isArray() && Collection.class.isAssignableFrom(sourceType)) {
+    public Converter getConverter(final ConversionType type) {
+        if (type.getTargetType().isArray() && Collection.class.isAssignableFrom(type.getSourceType())) {
             return Collection2ArrayOperation.INSTANCE;
         }
         return null;
@@ -32,9 +33,9 @@ public class Collection2ArraySupplier implements ConverterSupplier {
     /**
      * 构造函数操作
      */
-    protected static final class Collection2ArrayOperation implements Operation {
+    protected static final class Collection2ArrayOperation implements Converter {
 
-        protected static final Operation INSTANCE = new Collection2ArrayOperation();
+        protected static final Converter INSTANCE = new Collection2ArrayOperation();
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
@@ -50,7 +51,7 @@ public class Collection2ArraySupplier implements ConverterSupplier {
             int size = value.size();
             ArraySupplier arraySupplier = getArraySupplier(targetComponentType);
             ArrayObject array = arraySupplier.create(size);
-            Operation operation = null;
+            Converter operation = null;
             Object obj;
             int count = 0;
             for (Object v : value) {

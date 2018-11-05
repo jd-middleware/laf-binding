@@ -5,10 +5,10 @@ import java.io.File;
 /**
  * 文件转换器
  */
-public class FileConverter implements Converter {
+public class FileConverter implements SimpleConverter {
 
     @Override
-    public Object convert(final Conversion conversion) {
+    public Object execute(final Conversion conversion) {
         if (conversion == null) {
             return null;
         }
