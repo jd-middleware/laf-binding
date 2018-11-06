@@ -3,6 +3,7 @@ package com.jd.laf.binding.converter.supplier;
 import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.ConversionType;
 import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.reflect.Fields;
 import com.jd.laf.binding.reflect.Reflect;
 
@@ -18,8 +19,8 @@ public class Map2ObjectSupplier implements ConverterSupplier {
 
     @Override
     public Converter getConverter(final ConversionType type) {
-        Class targetType = type.getTargetType();
-        if (!Map.class.isAssignableFrom(type.getSourceType())
+        Class targetType = type.targetType;
+        if (!Map.class.isAssignableFrom(type.sourceType)
                 || Object.class.equals(targetType)
                 || Map.class.isAssignableFrom(targetType)
                 || Collection.class.isAssignableFrom(targetType)
@@ -47,17 +48,16 @@ public class Map2ObjectSupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            Class<?> targetType = conversion.getTargetType();
-            Constructor constructor = getDefaultConstructor(targetType);
+            Constructor constructor = getDefaultConstructor(conversion.targetType);
             if (constructor == null) {
                 return null;
             }
             Object obj = constructor.newInstance();
             Object key;
             Field field;
-            Map<String, Field> fields = Fields.getNames(targetType);
+            Map<String, Field> fields = Fields.getNames(conversion.targetType);
             if (!fields.isEmpty()) {
-                for (Map.Entry<?, ?> entry : ((Map<?, ?>) conversion.getSource()).entrySet()) {
+                for (Map.Entry<?, ?> entry : ((Map<?, ?>) conversion.source).entrySet()) {
                     key = entry.getKey();
                     if (key != null && (key instanceof CharSequence)) {
                         field = fields.get(key.toString());

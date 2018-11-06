@@ -1,9 +1,6 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.ConversionType;
-import com.jd.laf.binding.converter.Converter;
-import com.jd.laf.binding.converter.Converters;
+import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.ArraySuppliers;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
@@ -20,7 +17,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
 
     @Override
     public Converter getConverter(final ConversionType type) {
-        if (Collection.class.isAssignableFrom(type.getTargetType()) && type.getSourceType().isArray()) {
+        if (Collection.class.isAssignableFrom(type.targetType) && type.sourceType.isArray()) {
             return Array2CollectionOperation.INSTANCE;
         }
         return null;
@@ -41,18 +38,18 @@ public class Array2CollectionSupplier implements ConverterSupplier {
         @Override
         public Object execute(final Conversion conversion) throws Exception {
             //获取字段泛型
-            Class<?> inboxTargetComponentType = inbox(conversion.getScope().getGenericType());
+            Class<?> inboxTargetComponentType = inbox(conversion.scope.getGenericType());
             if (inboxTargetComponentType == null) {
                 return null;
             }
-            Class<?> sourceComponentType = conversion.getSourceType().getComponentType();
+            Class<?> sourceComponentType = conversion.sourceType.getComponentType();
             Class<?> inboxSourceComponentType = inbox(sourceComponentType);
             //构建数组
             ArraySupplier srcArraySupplier = ArraySuppliers.getArraySupplier(sourceComponentType);
-            ArrayObject srcArray = srcArraySupplier.wrap(conversion.getSource());
+            ArrayObject srcArray = srcArraySupplier.wrap(conversion.source);
             //数组大小
             int size = srcArray.length();
-            Collection result = Collections.create(conversion.getTargetType(), size);
+            Collection result = Collections.create(conversion.targetType, size);
             if (result == null) {
                 //不支持的集合类型
                 return null;
@@ -77,7 +74,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
                     if (componentOperation != null) {
                         //集合元素类型有转换器
                         obj = componentOperation.execute(new Conversion(inboxSourceComponentType, inboxTargetComponentType,
-                                element, conversion.getFormat()));
+                                element, conversion.format));
                     } else {
                         //获取实际的元素类型
                         inboxSourceElementType = inbox(element.getClass());
@@ -87,7 +84,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
                         if (op == null) {
                             return null;
                         }
-                        obj = op.execute(new Conversion(inboxSourceElementType, inboxTargetComponentType, element, conversion.getFormat()));
+                        obj = op.execute(new Conversion(inboxSourceElementType, inboxTargetComponentType, element, conversion.format));
                         lastInboxSourceElementType = inboxSourceElementType;
                     }
                     if (obj == null) {

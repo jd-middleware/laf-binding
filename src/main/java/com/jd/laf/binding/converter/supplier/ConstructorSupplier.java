@@ -3,6 +3,7 @@ package com.jd.laf.binding.converter.supplier;
 import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.ConversionType;
 import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 
 import java.lang.reflect.Constructor;
 
@@ -16,7 +17,7 @@ public class ConstructorSupplier implements ConverterSupplier {
     @Override
     public Converter getConverter(final ConversionType type) {
         // 判断是否有构造函数
-        Constructor constructor = getConstructor(type.getTargetType(), type.getSourceType());
+        Constructor constructor = getConstructor(type.targetType, type.sourceType);
         return constructor == null ? null : new ConstructorOperation(constructor);
     }
 
@@ -38,7 +39,7 @@ public class ConstructorSupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            return conversion == null ? null : constructor.newInstance(conversion.getSource());
+            return conversion == null ? null : constructor.newInstance(conversion.source);
         }
     }
 

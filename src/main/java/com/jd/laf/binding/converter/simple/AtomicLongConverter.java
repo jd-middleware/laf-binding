@@ -1,21 +1,23 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.simple;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.jd.laf.binding.converter.Conversion;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 长整数转换器
  */
-public class AtomicIntegerConverter extends NumberConverter {
+public class AtomicLongConverter extends NumberConverter {
 
     @Override
     public Object execute(final Conversion conversion) {
         if (conversion == null || conversion.source == null) {
             return null;
         } else if (conversion.source instanceof Number) {
-            return new AtomicInteger(((Number) conversion.source).intValue());
+            return new AtomicLong(((Number) conversion.source).longValue());
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return new AtomicInteger(Integer.parseInt((conversion.source.toString().trim())));
+                return new AtomicLong(Long.parseLong((conversion.source.toString().trim())));
             } catch (NumberFormatException e) {
             }
         }
@@ -23,7 +25,7 @@ public class AtomicIntegerConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?> type() {
+    public Class<?> targetType() {
         return Long.class;
     }
 }

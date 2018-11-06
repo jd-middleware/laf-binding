@@ -17,7 +17,7 @@ public class String2ArraySupplier implements ConverterSupplier {
 
     @Override
     public Converter getConverter(final ConversionType type) {
-        if (type.getTargetType().isArray() && CharSequence.class.isAssignableFrom(type.getSourceType())) {
+        if (type.targetType.isArray() && CharSequence.class.isAssignableFrom(type.sourceType)) {
             return String2ArrayOperation.INSTANCE;
         }
         return null;
@@ -37,15 +37,15 @@ public class String2ArraySupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            Class<?> targetElementType = conversion.getTargetType().getComponentType();
+            Class<?> targetElementType = conversion.targetType.getComponentType();
             Class<?> inboxElementType = inbox(targetElementType);
             Converter operation = Converters.getPlugin(String.class, inboxElementType);
             if (operation == null) {
                 return null;
             }
-            Object format = conversion.getFormat();
+            Object format = conversion.format;
             //分割字符串
-            List<String> parts = split(conversion.getSource().toString(), format == null ? null : format.toString());
+            List<String> parts = split(conversion.source.toString(), format == null ? null : format.toString());
             //构建数组
             ArraySupplier arraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
             ArrayObject array = arraySupplier.create(parts.size());

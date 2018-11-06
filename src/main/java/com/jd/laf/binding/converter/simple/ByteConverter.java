@@ -1,19 +1,21 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.simple;
+
+import com.jd.laf.binding.converter.Conversion;
 
 /**
- * 整数转换器
+ * 字节转换器
  */
-public class IntConverter extends NumberConverter {
+public class ByteConverter extends NumberConverter {
 
     @Override
     public Object execute(final Conversion conversion) {
         if (conversion == null || conversion.source == null) {
             return null;
         } else if (conversion.source instanceof Number) {
-            return ((Number) conversion.source).intValue();
+            return ((Number) conversion.source).byteValue();
         } else if (conversion.source instanceof CharSequence || conversion.source instanceof Character) {
             try {
-                return Integer.parseInt((conversion.source.toString().trim()));
+                return Byte.parseByte((conversion.source.toString().trim()));
             } catch (NumberFormatException e) {
             }
         }
@@ -21,7 +23,7 @@ public class IntConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?> type() {
-        return Integer.class;
+    public Class<?> targetType() {
+        return Byte.class;
     }
 }

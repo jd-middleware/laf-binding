@@ -1,11 +1,16 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.transformer;
 
 import com.jd.laf.binding.annotation.JsonConverter;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.Transformer;
 import com.jd.laf.binding.marshaller.JsonProvider;
 import com.jd.laf.binding.marshaller.JsonProviders;
 import com.jd.laf.binding.marshaller.Unmarshaller;
 
-public class JsonAnnotationConverter implements AnnotationConverter {
+/**
+ * JSON转换器
+ */
+public class JsonTransformer implements Transformer {
 
     @Override
     public boolean support(final Class<?> sourceType, final Class<?> targetType) {
@@ -26,7 +31,7 @@ public class JsonAnnotationConverter implements AnnotationConverter {
             return null;
         }
         //反序列化
-        return unmarshaller.unmarshall(conversion.getSource().toString(), conversion.getTargetType(), null);
+        return unmarshaller.unmarshall(conversion.source.toString(), conversion.targetType, null);
     }
 }
 

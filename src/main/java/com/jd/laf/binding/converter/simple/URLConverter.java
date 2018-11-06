@@ -1,4 +1,7 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.simple;
+
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.SimpleConverter;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,12 +27,12 @@ public class URLConverter implements SimpleConverter {
     }
 
     @Override
-    public boolean support(Class<?> type) {
-        return type != null && CharSequence.class.isAssignableFrom(type);
+    public boolean support(Class<?> sourceType) {
+        return sourceType != null && CharSequence.class.isAssignableFrom(sourceType);
     }
 
     @Override
-    public Class<?> type() {
+    public Class<?> targetType() {
         return URL.class;
     }
 }

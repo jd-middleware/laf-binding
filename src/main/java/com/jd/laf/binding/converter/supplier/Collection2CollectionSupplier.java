@@ -1,9 +1,6 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.ConversionType;
-import com.jd.laf.binding.converter.Converter;
-import com.jd.laf.binding.converter.Converters;
+import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.util.Collections;
 
 import java.util.Collection;
@@ -18,7 +15,7 @@ public class Collection2CollectionSupplier implements ConverterSupplier {
 
     @Override
     public Converter getConverter(final ConversionType type) {
-        if (Collection.class.isAssignableFrom(type.getTargetType()) && Collection.class.isAssignableFrom(type.getSourceType())) {
+        if (Collection.class.isAssignableFrom(type.targetType) && Collection.class.isAssignableFrom(type.sourceType)) {
             return Collection2CollectionOperation.INSTANCE;
         }
         return null;
@@ -40,18 +37,18 @@ public class Collection2CollectionSupplier implements ConverterSupplier {
         public Object execute(final Conversion conversion) throws Exception {
 
             //数据是文本，如果数组的元素支持转换，则分割文本进行转换
-            Class<?> inboxTargetComponentType = inbox(conversion.getScope().getGenericType());
+            Class<?> inboxTargetComponentType = inbox(conversion.scope.getGenericType());
             if (inboxTargetComponentType == null) {
                 return null;
             }
 
-            Collection value = (Collection) conversion.getSource();
+            Collection value = (Collection) conversion.source;
             int size = value.size();
-            Collection result = Collections.create(conversion.getTargetType(), size);
+            Collection result = Collections.create(conversion.targetType, size);
             if (result == null) {
                 return null;
             }
-            Object format = conversion.getFormat();
+            Object format = conversion.format;
             Class<?> inboxSourceComponentType, lastInboxSourceComponentType = null;
             Converter operation = null;
             Object obj;

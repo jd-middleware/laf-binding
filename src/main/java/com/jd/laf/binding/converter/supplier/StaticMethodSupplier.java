@@ -4,6 +4,7 @@ import com.jd.laf.binding.Option;
 import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.ConversionType;
 import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -30,7 +31,7 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
     @Override
     public Converter getConverter(final ConversionType type) {
         // 判断是否有构造函数
-        Method method = getMethod(type.getTargetType(), type.getSourceType(), methodName, getCache());
+        Method method = getMethod(type.targetType, type.sourceType, methodName, getCache());
         return method == null ? null : new MethodConverter(method);
     }
 
@@ -103,7 +104,7 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            return conversion == null ? null : method.invoke(null, conversion.getSource());
+            return conversion == null ? null : method.invoke(null, conversion.source);
         }
     }
 

@@ -1,9 +1,6 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.ConversionType;
-import com.jd.laf.binding.converter.Converter;
-import com.jd.laf.binding.converter.Converters;
+import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 
@@ -19,7 +16,7 @@ public class Collection2ArraySupplier implements ConverterSupplier {
 
     @Override
     public Converter getConverter(final ConversionType type) {
-        if (type.getTargetType().isArray() && Collection.class.isAssignableFrom(type.getSourceType())) {
+        if (type.targetType.isArray() && Collection.class.isAssignableFrom(type.sourceType)) {
             return Collection2ArrayOperation.INSTANCE;
         }
         return null;
@@ -39,14 +36,14 @@ public class Collection2ArraySupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            Class<?> targetComponentType = conversion.getTargetType().getComponentType();
+            Class<?> targetComponentType = conversion.targetType.getComponentType();
             Class<?> inboxTargetComponentType = inbox(targetComponentType);
             if (inboxTargetComponentType == null) {
                 return null;
             }
             Class<?> inboxSourceComponentType, lastInboxSourceComponentType = null;
-            final Collection<?> value = (Collection<?>) conversion.getSource();
-            final Object format = conversion.getFormat();
+            final Collection<?> value = (Collection<?>) conversion.source;
+            final Object format = conversion.format;
             //集合大小
             int size = value.size();
             ArraySupplier arraySupplier = getArraySupplier(targetComponentType);

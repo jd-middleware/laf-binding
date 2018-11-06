@@ -5,11 +5,11 @@ package com.jd.laf.binding.converter;
  */
 public class ConversionType {
     //原始类型
-    protected final Class<?> sourceType;
+    public final Class<?> sourceType;
     //目标类型
-    protected final Class<?> targetType;
+    public final Class<?> targetType;
     //作用域
-    protected final Scope scope;
+    public final Scope scope;
 
     public ConversionType(Class<?> sourceType, Class<?> targetType) {
         this(sourceType, targetType, null);
@@ -19,18 +19,6 @@ public class ConversionType {
         this.sourceType = sourceType;
         this.targetType = targetType;
         this.scope = scope;
-    }
-
-    public Class<?> getSourceType() {
-        return sourceType;
-    }
-
-    public Class<?> getTargetType() {
-        return targetType;
-    }
-
-    public Scope getScope() {
-        return scope;
     }
 
     @Override

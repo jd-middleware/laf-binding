@@ -1,4 +1,7 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.simple;
+
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.SimpleConverter;
 
 /**
  * 字符转换器
@@ -17,17 +20,17 @@ public class CharConverter implements SimpleConverter {
     }
 
     @Override
-    public boolean support(final Class<?> type) {
-        if (type == null) {
+    public boolean support(final Class<?> sourceType) {
+        if (sourceType == null) {
             return false;
-        } else if (CharSequence.class.isAssignableFrom(type)) {
+        } else if (CharSequence.class.isAssignableFrom(sourceType)) {
             return true;
         }
         return false;
     }
 
     @Override
-    public Class<?> type() {
+    public Class<?> targetType() {
         return Character.class;
     }
 }

@@ -1,15 +1,11 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.ConversionType;
-import com.jd.laf.binding.converter.Converter;
-import com.jd.laf.binding.converter.Converters;
+import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.util.Collections;
 
 import java.util.Collection;
 import java.util.List;
 
-import static com.jd.laf.binding.reflect.Generics.getGenericType;
 import static com.jd.laf.binding.util.Primitive.inbox;
 import static com.jd.laf.binding.util.Strings.split;
 
@@ -21,7 +17,7 @@ public class String2CollectionSupplier implements ConverterSupplier {
 
     @Override
     public Converter getConverter(final ConversionType type) {
-        if (Collection.class.isAssignableFrom(type.getTargetType()) && CharSequence.class.isAssignableFrom(type.getSourceType())) {
+        if (Collection.class.isAssignableFrom(type.targetType) && CharSequence.class.isAssignableFrom(type.sourceType)) {
             return String2CollectionOperation.INSTANCE;
         }
         return null;
@@ -41,7 +37,7 @@ public class String2CollectionSupplier implements ConverterSupplier {
 
         @Override
         public Object execute(final Conversion conversion) throws Exception {
-            Class<?> inboxTargetComponentType = inbox(conversion.getScope().getGenericType());
+            Class<?> inboxTargetComponentType = inbox(conversion.scope.getGenericType());
             if (inboxTargetComponentType == null) {
                 return null;
             }
@@ -49,10 +45,10 @@ public class String2CollectionSupplier implements ConverterSupplier {
             if (operation == null) {
                 return null;
             }
-            Object format = conversion.getFormat();
+            Object format = conversion.format;
             //分割字符串
-            List<String> parts = split(conversion.getSource().toString(), format == null ? null : format.toString());
-            Collection result = Collections.create(conversion.getTargetType(), parts.size());
+            List<String> parts = split(conversion.source.toString(), format == null ? null : format.toString());
+            Collection result = Collections.create(conversion.targetType, parts.size());
             if (result == null) {
                 //不支持的集合类型
                 return null;

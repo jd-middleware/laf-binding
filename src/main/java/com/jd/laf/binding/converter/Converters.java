@@ -2,7 +2,6 @@ package com.jd.laf.binding.converter;
 
 
 import com.jd.laf.binding.Option;
-import com.jd.laf.binding.converter.supplier.ConverterSupplier;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,10 +45,36 @@ public abstract class Converters {
     public static Converter getPlugin(final ConversionType type) {
         if (type == null) {
             return null;
-        } else if (type.getTargetType() == type.getSourceType() || type.getTargetType().isAssignableFrom(type.getSourceType())) {
+        } else if (type.targetType == type.sourceType || type.targetType.isAssignableFrom(type.sourceType)) {
             //可以直接赋值
             return NONE;
-        } else if (plugins == null) {
+        }
+        //判断是否有转化器
+        Option<Converter> option = operations.get(type);
+        if (option == null) {
+            //没有缓存，则重新计算
+            Converter operation = null;
+            for (ConverterSupplier plugin : getPlugins()) {
+                operation = plugin.getConverter(type);
+                if (operation != null) {
+                    break;
+                }
+            }
+            option = new Option<Converter>(operation);
+            //缓存
+            Option<Converter> exists = operations.putIfAbsent(type, option);
+            if (exists != null) {
+                option = exists;
+            }
+        }
+        return option.get();
+    }
+
+    /**
+     * 加载插件
+     */
+    protected static List<ConverterSupplier> getPlugins() {
+        if (plugins == null) {
             //加载插件
             synchronized (Converters.class) {
                 if (plugins == null) {
@@ -69,26 +94,7 @@ public abstract class Converters {
                 }
             }
         }
-
-        //判断是否有转化器
-        Option<Converter> option = operations.get(type);
-        if (option == null) {
-            //没有缓存，则重新计算
-            Converter operation = null;
-            for (ConverterSupplier plugin : plugins) {
-                operation = plugin.getConverter(type);
-                if (operation != null) {
-                    break;
-                }
-            }
-            option = new Option<Converter>(operation);
-            //缓存
-            Option<Converter> exists = operations.putIfAbsent(type, option);
-            if (exists != null) {
-                option = exists;
-            }
-        }
-        return option.get();
+        return plugins;
     }
 
 

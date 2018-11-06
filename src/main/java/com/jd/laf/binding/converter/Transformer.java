@@ -1,9 +1,9 @@
 package com.jd.laf.binding.converter;
 
 /**
- * 注解转换器
+ * 注解转换器，采用数据反序列化方式
  */
-public interface AnnotationConverter extends Converter {
+public interface Transformer extends Converter {
 
     /**
      * 是否支持该类型转换

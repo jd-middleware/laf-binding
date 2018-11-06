@@ -1,9 +1,6 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.Conversion;
-import com.jd.laf.binding.converter.ConversionType;
-import com.jd.laf.binding.converter.Converter;
-import com.jd.laf.binding.converter.Converters;
+import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 
@@ -17,7 +14,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
 
     @Override
     public Converter getConverter(final ConversionType type) {
-        if (type.getTargetType().isArray() && type.getSourceType().isArray()) {
+        if (type.targetType.isArray() && type.sourceType.isArray()) {
             return Array2ArrayOperation.INSTANCE;
         }
         return null;
@@ -38,8 +35,8 @@ public class Array2ArraySupplier implements ConverterSupplier {
         @Override
         public Object execute(final Conversion conversion) throws Exception {
             //获取数组元素类型
-            Class<?> targetComponentType = conversion.getTargetType().getComponentType();
-            Class<?> sourceComponentType = conversion.getSourceType().getComponentType();
+            Class<?> targetComponentType = conversion.targetType.getComponentType();
+            Class<?> sourceComponentType = conversion.sourceType.getComponentType();
             Class<?> inboxTargetComponentType = inbox(targetComponentType);
             Class<?> inboxSourceComponentType = inbox(sourceComponentType);
             if (inboxTargetComponentType == null || inboxSourceComponentType == null) {
@@ -49,7 +46,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
             if (inboxTargetComponentType.equals(inboxSourceComponentType)
                     || inboxTargetComponentType.isAssignableFrom(inboxSourceComponentType)) {
                 //类型可以直接复制
-                return conversion.getSource();
+                return conversion.source;
             }
             //获取转换器
             Converter componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
@@ -58,7 +55,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
             //构建数组
             ArraySupplier targetArraySupplier = getArraySupplier(targetComponentType);
 
-            ArrayObject srcArray = srcArraySupplier.wrap(conversion.getSource());
+            ArrayObject srcArray = srcArraySupplier.wrap(conversion.source);
             int size = srcArray.length();
             ArrayObject targetArray = targetArraySupplier.create(size);
             Object obj;
@@ -79,7 +76,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
                     if (componentOperation != null) {
                         //集合元素类型有转换器
                         obj = componentOperation.execute(new Conversion(inboxSourceComponentType, inboxTargetComponentType,
-                                element, conversion.getFormat()));
+                                element, conversion.format));
                     } else {
                         //获取实际的元素类型
                         inboxSourceElementType = inbox(element.getClass());
@@ -89,7 +86,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
                         if (op == null) {
                             return null;
                         }
-                        obj = op.execute(new Conversion(inboxSourceElementType, inboxTargetComponentType, element, conversion.getFormat()));
+                        obj = op.execute(new Conversion(inboxSourceElementType, inboxTargetComponentType, element, conversion.format));
                         lastInboxSourceElementType = inboxSourceElementType;
                     }
                     if (obj == null) {

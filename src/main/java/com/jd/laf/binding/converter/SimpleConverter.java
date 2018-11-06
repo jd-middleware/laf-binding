@@ -8,15 +8,15 @@ public interface SimpleConverter extends Converter {
     /**
      * 是否支持该类型转换
      *
-     * @param type
+     * @param sourceType 原始类型
      * @return
      */
-    boolean support(Class<?> type);
+    boolean support(Class<?> sourceType);
 
     /**
      * 支持的目标类型，基本类型会自动装箱
      *
-     * @return 字段类型
+     * @return 目标类型
      */
-    Class<?> type();
+    Class<?> targetType();
 }

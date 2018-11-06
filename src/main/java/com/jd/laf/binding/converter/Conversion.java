@@ -5,9 +5,9 @@ package com.jd.laf.binding.converter;
  */
 public class Conversion extends ConversionType {
     //原始对象
-    protected final Object source;
+    public final Object source;
     //数据转换参数
-    protected final Object format;
+    public final Object format;
 
     public Conversion(Class<?> sourceType, Class<?> targetType, Object source) {
         this(sourceType, targetType, source, null, null);
@@ -21,14 +21,6 @@ public class Conversion extends ConversionType {
         super(sourceType, targetType, scope);
         this.source = source;
         this.format = format;
-    }
-
-    public Object getSource() {
-        return source;
-    }
-
-    public Object getFormat() {
-        return format;
     }
 
 }

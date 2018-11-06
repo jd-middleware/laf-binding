@@ -1,29 +1,29 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.simple;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.jd.laf.binding.converter.Conversion;
 
 /**
  * 布尔转换器
  */
-public class AtomicBooleanConverter extends NumberConverter {
+public class BooleanConverter extends NumberConverter {
 
     @Override
     public Object execute(final Conversion conversion) {
         if (conversion == null || conversion.source == null) {
             return null;
         } else if (conversion.source instanceof Number) {
-            return new AtomicBoolean(((Number) conversion.source).intValue() != 0 ? Boolean.TRUE : Boolean.FALSE);
+            return ((Number) conversion.source).intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
         } else if (conversion.source instanceof Character) {
-            return new AtomicBoolean(((Character) conversion.source) != '0' ? Boolean.TRUE : Boolean.FALSE);
+            return ((Character) conversion.source) != '0' ? Boolean.TRUE : Boolean.FALSE;
         } else if (conversion.source instanceof CharSequence) {
             String value = conversion.source.toString().trim();
             if ("true".equalsIgnoreCase(value)) {
-                return new AtomicBoolean(true);
+                return true;
             } else if ("false".equalsIgnoreCase(value)) {
-                return new AtomicBoolean(false);
+                return false;
             }
             try {
-                return new AtomicBoolean(Long.parseLong(value) != 0);
+                return Long.parseLong(value) != 0;
             } catch (NumberFormatException e) {
                 return null;
             }
@@ -32,7 +32,7 @@ public class AtomicBooleanConverter extends NumberConverter {
     }
 
     @Override
-    public Class<?> type() {
+    public Class<?> targetType() {
         return Boolean.class;
     }
 }

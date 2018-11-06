@@ -1,11 +1,16 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.transformer;
 
 import com.jd.laf.binding.annotation.XmlConverter;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.Transformer;
 import com.jd.laf.binding.marshaller.Unmarshaller;
 import com.jd.laf.binding.marshaller.XmlProvider;
 import com.jd.laf.binding.marshaller.XmlProviders;
 
-public class XmlAnnotationConverter implements AnnotationConverter {
+/**
+ * XML转换器
+ */
+public class XmlTransformer implements Transformer {
 
     @Override
     public boolean support(final Class<?> sourceType, final Class<?> targetType) {
@@ -26,7 +31,7 @@ public class XmlAnnotationConverter implements AnnotationConverter {
             return null;
         }
         //反序列化
-        return unmarshaller.unmarshall(conversion.getSource().toString(), conversion.getTargetType(), null);
+        return unmarshaller.unmarshall(conversion.source.toString(), conversion.targetType, null);
     }
 }
 

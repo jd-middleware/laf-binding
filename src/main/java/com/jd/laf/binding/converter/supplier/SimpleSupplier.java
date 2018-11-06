@@ -4,6 +4,7 @@ package com.jd.laf.binding.converter.supplier;
 import com.jd.laf.binding.Option;
 import com.jd.laf.binding.converter.ConversionType;
 import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.converter.SimpleConverter;
 
 import java.util.*;
@@ -25,17 +26,17 @@ public class SimpleSupplier implements ConverterSupplier {
     public Converter getConverter(final ConversionType type) {
 
         //去掉Scope作用域
-        ConversionType key = new ConversionType(type.getSourceType(), type.getTargetType());
+        ConversionType key = new ConversionType(type.sourceType, type.targetType);
 
         //判断是否有转化器
         Option<SimpleConverter> option = converters.get(key);
         if (option == null) {
             option = new Option<SimpleConverter>();
             //没有缓存，则重新计算
-            List<SimpleConverter> converters = getPlugins().get(type.getTargetType());
+            List<SimpleConverter> converters = getPlugins().get(type.targetType);
             if (converters != null) {
                 for (SimpleConverter converter : converters) {
-                    if (converter.support(type.getSourceType())) {
+                    if (converter.support(type.sourceType)) {
                         option.setValue(converter);
                         break;
                     }
@@ -69,10 +70,10 @@ public class SimpleSupplier implements ConverterSupplier {
                     //加载转换器插件
                     ServiceLoader<SimpleConverter> loader = ServiceLoader.load(SimpleConverter.class, SimpleSupplier.class.getClassLoader());
                     for (SimpleConverter converter : loader) {
-                        List<SimpleConverter> list = map.get(converter.type());
+                        List<SimpleConverter> list = map.get(converter.targetType());
                         if (list == null) {
                             list = new ArrayList<SimpleConverter>(1);
-                            map.put(converter.type(), list);
+                            map.put(converter.targetType(), list);
                         }
                         list.add(converter);
                     }

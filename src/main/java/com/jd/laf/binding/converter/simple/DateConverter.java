@@ -1,4 +1,7 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.simple;
+
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.SimpleConverter;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -84,21 +87,21 @@ public class DateConverter implements SimpleConverter {
     }
 
     @Override
-    public boolean support(final Class<?> type) {
-        if (type == null) {
+    public boolean support(final Class<?> sourceType) {
+        if (sourceType == null) {
             return false;
-        } else if (Calendar.class.isAssignableFrom(type)) {
+        } else if (Calendar.class.isAssignableFrom(sourceType)) {
             return true;
-        } else if (Number.class.isAssignableFrom(type)) {
+        } else if (Number.class.isAssignableFrom(sourceType)) {
             return true;
-        } else if (CharSequence.class.isAssignableFrom(type)) {
+        } else if (CharSequence.class.isAssignableFrom(sourceType)) {
             return true;
         }
         return false;
     }
 
     @Override
-    public Class<?> type() {
+    public Class<?> targetType() {
         return Date.class;
     }
 }

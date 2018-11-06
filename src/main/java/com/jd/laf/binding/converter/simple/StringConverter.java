@@ -1,4 +1,7 @@
-package com.jd.laf.binding.converter;
+package com.jd.laf.binding.converter.simple;
+
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.SimpleConverter;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -52,12 +55,12 @@ public class StringConverter implements SimpleConverter {
     }
 
     @Override
-    public boolean support(Class<?> type) {
+    public boolean support(Class<?> sourceType) {
         return true;
     }
 
     @Override
-    public Class<?> type() {
+    public Class<?> targetType() {
         return String.class;
     }
 }
