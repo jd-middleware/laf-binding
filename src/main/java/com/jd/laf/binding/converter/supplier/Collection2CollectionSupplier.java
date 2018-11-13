@@ -65,6 +65,7 @@ public class Collection2CollectionSupplier implements ConverterSupplier {
                         return false;
                     }
                     lastInboxSourceComponentType = inboxSourceComponentType;
+                    result.add(obj);
                 }
             }
             return result;
