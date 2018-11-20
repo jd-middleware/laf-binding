@@ -3,6 +3,7 @@ package com.jd.laf.binding.reflect;
 import com.jd.laf.binding.Option;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,12 +67,20 @@ public abstract class Constructors {
             Constructor constructor = null;
             //遍历
             if (constructors != null) {
-                for (Constructor c : constructors) {
-                    parameters = c.getParameterTypes();
-                    if (parameters == null || parameters.length == 0) {
-                        //单个参数，处理基本类型，如果能直接赋值
-                        constructor = c;
-                        break;
+                // 获取公共的实体类的公共构造函数
+                int modifiers = type.getModifiers();
+                if (Modifier.isPublic(modifiers)
+                        && !Modifier.isAbstract(modifiers)
+                        && !Modifier.isInterface(modifiers)) {
+                    for (Constructor c : constructors) {
+                        if (Modifier.isPublic(c.getModifiers())) {
+                            parameters = c.getParameterTypes();
+                            if (parameters == null || parameters.length == 0) {
+                                //单个参数，处理基本类型，如果能直接赋值
+                                constructor = c;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -110,12 +119,20 @@ public abstract class Constructors {
             Constructor constructor = null;
             //遍历
             if (constructors != null) {
-                for (Constructor c : constructors) {
-                    parameters = c.getParameterTypes();
-                    if (parameters.length == 1 && inbox(parameters[0]).isAssignableFrom(parameterType)) {
-                        //单个参数，处理基本类型，如果能直接赋值
-                        constructor = c;
-                        break;
+                // 获取公共的实体类的公共构造函数
+                int modifiers = targetType.getModifiers();
+                if (Modifier.isPublic(modifiers)
+                        && !Modifier.isAbstract(modifiers)
+                        && !Modifier.isInterface(modifiers)) {
+                    for (Constructor c : constructors) {
+                        if (Modifier.isPublic(c.getModifiers())) {
+                            parameters = c.getParameterTypes();
+                            if (parameters.length == 1 && inbox(parameters[0]).isAssignableFrom(parameterType)) {
+                                //单个参数，处理基本类型，如果能直接赋值
+                                constructor = c;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -129,5 +146,6 @@ public abstract class Constructors {
         }
         return option.get();
     }
+
 
 }
