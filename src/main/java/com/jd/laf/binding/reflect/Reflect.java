@@ -1,14 +1,18 @@
 package com.jd.laf.binding.reflect;
 
-import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.Scope;
 import com.jd.laf.binding.converter.Scope.FieldScope;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import static com.jd.laf.binding.Plugin.CONVERTER;
+import static com.jd.laf.binding.Plugin.PROPERTY;
 import static com.jd.laf.binding.reflect.Fields.getField;
-import static com.jd.laf.binding.reflect.PropertySuppliers.getPlugin;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
@@ -76,7 +80,7 @@ public abstract class Reflect {
         if (target == null || name == null || name.isEmpty() || factory == null) {
             return null;
         }
-        PropertySupplier getter = getPlugin(target.getClass());
+        PropertySupplier getter = PROPERTY.select(target.getClass());
         try {
             Object result = getter == null ? null : getter.get(target, name);
             if (result == null && Character.isJavaIdentifierStart(name.charAt(0))) {
@@ -191,7 +195,7 @@ public abstract class Reflect {
             Class<?> inboxSourceType = inbox(value.getClass());
             FieldScope scope = new FieldScope(field);
             //获取转换器
-            Converter operation = Converters.getPlugin(new ConversionType(inboxSourceType, inboxTargetType, scope));
+            Converter operation = CONVERTER.select(new ConversionType(inboxSourceType, inboxTargetType, scope));
             if (operation != null) {
                 //拿到转换器
                 Object obj = operation.execute(new Conversion(inboxSourceType, inboxTargetType, value, format, scope));
@@ -221,7 +225,7 @@ public abstract class Reflect {
             return false;
         }
         //获取转换器
-        return Converters.getPlugin(inbox(source), inbox(target)) != null;
+        return CONVERTER.select(new ConversionType(inbox(source), inbox(target))) != null;
     }
 
     /**
@@ -236,7 +240,7 @@ public abstract class Reflect {
         if (source == null || target == null) {
             return false;
         }
-        return Converters.getPlugin(new ConversionType(inbox(source), inbox(target), scope)) != null;
+        return CONVERTER.select(new ConversionType(inbox(source), inbox(target), scope)) != null;
     }
 
 }

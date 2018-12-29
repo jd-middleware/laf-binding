@@ -1,10 +1,14 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 
-import static com.jd.laf.binding.reflect.array.ArraySuppliers.getArraySupplier;
+import static com.jd.laf.binding.Plugin.ARRAY;
+import static com.jd.laf.binding.Plugin.CONVERTER;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
@@ -49,11 +53,11 @@ public class Array2ArraySupplier implements ConverterSupplier {
                 return conversion.source;
             }
             //获取转换器
-            Converter componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
+            Converter componentOperation = CONVERTER.select(new ConversionType(inboxSourceComponentType, inboxTargetComponentType));
             //用原始元素类型构建数组
-            ArraySupplier srcArraySupplier = getArraySupplier(sourceComponentType);
+            ArraySupplier srcArraySupplier = ARRAY.select(sourceComponentType);
             //构建数组
-            ArraySupplier targetArraySupplier = getArraySupplier(targetComponentType);
+            ArraySupplier targetArraySupplier = ARRAY.select(targetComponentType);
 
             ArrayObject srcArray = srcArraySupplier.wrap(conversion.source);
             int size = srcArray.length();
@@ -82,7 +86,7 @@ public class Array2ArraySupplier implements ConverterSupplier {
                         inboxSourceElementType = inbox(element.getClass());
                         //如果类型有变更，则根据实际类型获取转换器
                         op = inboxSourceElementType.equals(lastInboxSourceElementType) ? op :
-                                Converters.getPlugin(inboxSourceElementType, inboxTargetComponentType);
+                                CONVERTER.select(new ConversionType(inboxSourceElementType, inboxTargetComponentType));
                         if (op == null) {
                             return null;
                         }

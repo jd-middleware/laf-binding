@@ -3,12 +3,12 @@ package com.jd.laf.binding.binder;
 import com.jd.laf.binding.annotation.XmlValue;
 import com.jd.laf.binding.marshaller.Unmarshaller;
 import com.jd.laf.binding.marshaller.XmlProvider;
-import com.jd.laf.binding.marshaller.XmlProviders;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.Field;
 
+import static com.jd.laf.binding.Plugin.XML;
 import static com.jd.laf.binding.reflect.Reflect.evaluate;
 import static com.jd.laf.binding.reflect.Reflect.set;
 
@@ -39,7 +39,7 @@ public class XmlValueBinder implements Binder {
             return false;
         }
         //获取JSON插件
-        XmlProvider plugin = XmlProviders.getPlugin();
+        XmlProvider plugin = XML.get();
         Unmarshaller unmarshaller = plugin == null ? null : plugin.getUnmarshaller();
         if (unmarshaller == null) {
             return false;

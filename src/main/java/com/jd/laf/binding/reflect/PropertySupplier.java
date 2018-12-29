@@ -1,5 +1,7 @@
 package com.jd.laf.binding.reflect;
 
+import java.lang.reflect.Method;
+
 /**
  * 属性获取器
  */
@@ -22,4 +24,26 @@ public interface PropertySupplier {
      * @return 支持标识
      */
     boolean support(Class<?> clazz);
+
+    /**
+     * 根据反射方法来调用
+     */
+    class MethodSupplier implements PropertySupplier {
+
+        protected Method method;
+
+        public MethodSupplier(Method method) {
+            this.method = method;
+        }
+
+        @Override
+        public Object get(final Object target, final String name) throws Exception {
+            return method.invoke(target, name);
+        }
+
+        @Override
+        public boolean support(Class<?> clazz) {
+            return true;
+        }
+    }
 }

@@ -1,10 +1,14 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.util.Collections;
 
 import java.util.Collection;
 
+import static com.jd.laf.binding.Plugin.CONVERTER;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
@@ -58,7 +62,7 @@ public class Collection2CollectionSupplier implements ConverterSupplier {
                 } else {
                     inboxSourceComponentType = inbox(v.getClass());
                     operation = inboxSourceComponentType.equals(lastInboxSourceComponentType) ? operation :
-                            Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
+                            CONVERTER.select(new ConversionType(inboxSourceComponentType, inboxTargetComponentType));
                     obj = operation.execute(new Conversion(inboxSourceComponentType, inboxTargetComponentType, v, format));
                     if (obj == null) {
                         //转换失败

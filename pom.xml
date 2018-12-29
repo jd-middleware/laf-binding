@@ -6,7 +6,7 @@
 
     <groupId>com.jd.laf.binding</groupId>
     <artifactId>laf-binding</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <organization>
         <name>JD.com, Inc.</name>
@@ -24,9 +24,15 @@
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <junit.version>4.12</junit.version>
+        <laf-extension.version>1.0.7</laf-extension.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.jd.laf</groupId>
+            <artifactId>laf-extension</artifactId>
+            <version>${laf-extension.version}</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

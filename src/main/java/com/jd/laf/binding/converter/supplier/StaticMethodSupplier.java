@@ -1,10 +1,10 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.Option;
-import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.ConversionType;
 import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.Converter.MethodConverter;
 import com.jd.laf.binding.converter.ConverterSupplier;
+import com.jd.laf.extension.Option;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -89,23 +89,6 @@ public abstract class StaticMethodSupplier implements ConverterSupplier {
 
         }
         return option.get();
-    }
-
-    /**
-     * 构造函数操作
-     */
-    protected static final class MethodConverter implements Converter {
-
-        protected final Method method;
-
-        public MethodConverter(Method method) {
-            this.method = method;
-        }
-
-        @Override
-        public Object execute(final Conversion conversion) throws Exception {
-            return conversion == null ? null : method.invoke(null, conversion.source);
-        }
     }
 
 }

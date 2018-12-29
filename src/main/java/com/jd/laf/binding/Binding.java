@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.jd.laf.binding.binder.Binders.getPlugin;
+import static com.jd.laf.binding.Plugin.BINDER;
 import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.reflect.Fields.getFields;
 
@@ -26,7 +26,7 @@ import static com.jd.laf.binding.reflect.Fields.getFields;
  * 绑定器
  * Created by hexiaofeng on 16-8-29.
  */
-public class Binding {
+public abstract class Binding {
 
     // 缓存类的绑定关系
     protected static ConcurrentMap<Class<?>, List<BindingField>> bindingFields = new ConcurrentHashMap<Class<?>, List<BindingField>>();
@@ -160,7 +160,7 @@ public class Binding {
                     annotations = field.getAnnotations();
                     for (Annotation annotation : annotations) {
                         //是否是绑定注解
-                        binder = getPlugin(annotation.annotationType());
+                        binder = BINDER.get(annotation.annotationType());
                         if (binder != null) {
                             if (bindingField == null) {
                                 bindingField = new BindingField(field, factory.getAccessor(field));

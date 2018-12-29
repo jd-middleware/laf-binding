@@ -1,11 +1,12 @@
 package com.jd.laf.binding.reflect.array.supplier;
 
 import com.jd.laf.binding.reflect.array.ArrayObject;
+import com.jd.laf.extension.Ordered;
 
 /**
  * 数组提供者
  */
-public interface ArraySupplier {
+public interface ArraySupplier extends Ordered {
 
     /**
      * 创建数组
@@ -31,10 +32,4 @@ public interface ArraySupplier {
      */
     boolean support(Class<?> clazz);
 
-    /**
-     * 优先级，数值越低优先级越高
-     *
-     * @return
-     */
-    int order();
 }

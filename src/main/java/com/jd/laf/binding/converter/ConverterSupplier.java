@@ -1,6 +1,6 @@
 package com.jd.laf.binding.converter;
 
-import com.jd.laf.binding.Ordered;
+import com.jd.laf.extension.Ordered;
 
 /**
  * 转换提供者

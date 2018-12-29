@@ -4,8 +4,9 @@ import com.jd.laf.binding.annotation.JsonConverter;
 import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.Transformer;
 import com.jd.laf.binding.marshaller.JsonProvider;
-import com.jd.laf.binding.marshaller.JsonProviders;
 import com.jd.laf.binding.marshaller.Unmarshaller;
+
+import static com.jd.laf.binding.Plugin.JSON;
 
 /**
  * JSON转换器
@@ -25,7 +26,7 @@ public class JsonTransformer implements Transformer {
     @Override
     public Object execute(final Conversion conversion) throws Exception {
         //获取JSON插件
-        JsonProvider plugin = JsonProviders.getPlugin();
+        JsonProvider plugin = JSON.get();
         Unmarshaller unmarshaller = plugin == null ? null : plugin.getUnmarshaller();
         if (unmarshaller == null) {
             return null;

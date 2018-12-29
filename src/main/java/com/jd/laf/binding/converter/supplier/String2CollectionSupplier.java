@@ -1,11 +1,15 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.util.Collections;
 
 import java.util.Collection;
 import java.util.List;
 
+import static com.jd.laf.binding.Plugin.CONVERTER;
 import static com.jd.laf.binding.util.Primitive.inbox;
 import static com.jd.laf.binding.util.Strings.split;
 
@@ -41,7 +45,7 @@ public class String2CollectionSupplier implements ConverterSupplier {
             if (inboxTargetComponentType == null) {
                 return null;
             }
-            Converter operation = Converters.getPlugin(String.class, inboxTargetComponentType);
+            Converter operation = CONVERTER.select(new ConversionType(String.class, inboxTargetComponentType));
             if (operation == null) {
                 return null;
             }

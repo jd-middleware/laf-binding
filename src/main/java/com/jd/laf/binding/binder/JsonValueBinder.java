@@ -2,13 +2,13 @@ package com.jd.laf.binding.binder;
 
 import com.jd.laf.binding.annotation.JsonValue;
 import com.jd.laf.binding.marshaller.JsonProvider;
-import com.jd.laf.binding.marshaller.JsonProviders;
 import com.jd.laf.binding.marshaller.Unmarshaller;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.reflect.Field;
 
+import static com.jd.laf.binding.Plugin.JSON;
 import static com.jd.laf.binding.reflect.Reflect.evaluate;
 import static com.jd.laf.binding.reflect.Reflect.set;
 
@@ -39,7 +39,7 @@ public class JsonValueBinder implements Binder {
             return false;
         }
         //获取JSON插件
-        JsonProvider plugin = JsonProviders.getPlugin();
+        JsonProvider plugin = JSON.get();
         Unmarshaller unmarshaller = plugin == null ? null : plugin.getUnmarshaller();
         if (unmarshaller == null) {
             return false;

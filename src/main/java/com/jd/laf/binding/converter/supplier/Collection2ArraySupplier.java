@@ -1,12 +1,16 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 
 import java.util.Collection;
 
-import static com.jd.laf.binding.reflect.array.ArraySuppliers.getArraySupplier;
+import static com.jd.laf.binding.Plugin.ARRAY;
+import static com.jd.laf.binding.Plugin.CONVERTER;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
@@ -46,7 +50,7 @@ public class Collection2ArraySupplier implements ConverterSupplier {
             final Object format = conversion.format;
             //集合大小
             int size = value.size();
-            ArraySupplier arraySupplier = getArraySupplier(targetComponentType);
+            ArraySupplier arraySupplier = ARRAY.select(targetComponentType);
             ArrayObject array = arraySupplier.create(size);
             Converter operation = null;
             Object obj;
@@ -60,7 +64,7 @@ public class Collection2ArraySupplier implements ConverterSupplier {
                 } else {
                     inboxSourceComponentType = inbox(v.getClass());
                     operation = inboxSourceComponentType.equals(lastInboxSourceComponentType) ? operation :
-                            Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
+                            CONVERTER.select(new ConversionType(inboxSourceComponentType, inboxTargetComponentType));
                     obj = operation.execute(new Conversion(inboxSourceComponentType, inboxTargetComponentType, v, format));
                     if (obj == null) {
                         return false;

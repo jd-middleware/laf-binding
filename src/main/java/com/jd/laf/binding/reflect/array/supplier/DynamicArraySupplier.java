@@ -1,7 +1,6 @@
 package com.jd.laf.binding.reflect.array.supplier;
 
 import com.jd.laf.binding.reflect.array.ArrayObject;
-import com.jd.laf.binding.reflect.array.DoubleArray;
 import com.jd.laf.binding.reflect.array.DynamicArray;
 
 /**

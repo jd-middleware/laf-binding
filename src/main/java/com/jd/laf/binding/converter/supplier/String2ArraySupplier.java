@@ -1,12 +1,16 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.reflect.array.ArrayObject;
-import com.jd.laf.binding.reflect.array.ArraySuppliers;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 
 import java.util.List;
 
+import static com.jd.laf.binding.Plugin.ARRAY;
+import static com.jd.laf.binding.Plugin.CONVERTER;
 import static com.jd.laf.binding.util.Primitive.inbox;
 import static com.jd.laf.binding.util.Strings.split;
 
@@ -39,7 +43,7 @@ public class String2ArraySupplier implements ConverterSupplier {
         public Object execute(final Conversion conversion) throws Exception {
             Class<?> targetElementType = conversion.targetType.getComponentType();
             Class<?> inboxElementType = inbox(targetElementType);
-            Converter operation = Converters.getPlugin(String.class, inboxElementType);
+            Converter operation = CONVERTER.select(new ConversionType(String.class, inboxElementType));
             if (operation == null) {
                 return null;
             }
@@ -47,7 +51,7 @@ public class String2ArraySupplier implements ConverterSupplier {
             //分割字符串
             List<String> parts = split(conversion.source.toString(), format == null ? null : format.toString());
             //构建数组
-            ArraySupplier arraySupplier = ArraySuppliers.getArraySupplier(targetElementType);
+            ArraySupplier arraySupplier = ARRAY.select(targetElementType);
             ArrayObject array = arraySupplier.create(parts.size());
             int pos = 0;
             Object obj;

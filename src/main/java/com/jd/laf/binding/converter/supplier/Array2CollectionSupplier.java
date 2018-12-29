@@ -1,13 +1,17 @@
 package com.jd.laf.binding.converter.supplier;
 
-import com.jd.laf.binding.converter.*;
+import com.jd.laf.binding.converter.Conversion;
+import com.jd.laf.binding.converter.ConversionType;
+import com.jd.laf.binding.converter.Converter;
+import com.jd.laf.binding.converter.ConverterSupplier;
 import com.jd.laf.binding.reflect.array.ArrayObject;
-import com.jd.laf.binding.reflect.array.ArraySuppliers;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 import com.jd.laf.binding.util.Collections;
 
 import java.util.Collection;
 
+import static com.jd.laf.binding.Plugin.ARRAY;
+import static com.jd.laf.binding.Plugin.CONVERTER;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
@@ -45,7 +49,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
             Class<?> sourceComponentType = conversion.sourceType.getComponentType();
             Class<?> inboxSourceComponentType = inbox(sourceComponentType);
             //构建数组
-            ArraySupplier srcArraySupplier = ArraySuppliers.getArraySupplier(sourceComponentType);
+            ArraySupplier srcArraySupplier = ARRAY.select(sourceComponentType);
             ArrayObject srcArray = srcArraySupplier.wrap(conversion.source);
             //数组大小
             int size = srcArray.length();
@@ -54,7 +58,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
                 //不支持的集合类型
                 return null;
             }
-            Converter componentOperation = Converters.getPlugin(inboxSourceComponentType, inboxTargetComponentType);
+            Converter componentOperation = CONVERTER.select(new ConversionType(inboxSourceComponentType, inboxTargetComponentType));
             Object obj;
             Object element;
             Converter op = null;
@@ -80,7 +84,7 @@ public class Array2CollectionSupplier implements ConverterSupplier {
                         inboxSourceElementType = inbox(element.getClass());
                         //如果类型有变更，则根据实际类型获取转换器
                         op = inboxSourceElementType.equals(lastInboxSourceElementType) ? op :
-                                Converters.getPlugin(inboxSourceElementType, inboxTargetComponentType);
+                                CONVERTER.select(new ConversionType(inboxSourceElementType, inboxTargetComponentType));
                         if (op == null) {
                             return null;
                         }

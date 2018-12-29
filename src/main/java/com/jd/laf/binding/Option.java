@@ -5,23 +5,7 @@ package com.jd.laf.binding;
  *
  * @param <T>
  */
-public class Option<T> {
-    //值
-    T value;
-
-    public Option() {
-    }
-
-    public Option(T value) {
-        this.value = value;
-    }
-
-    public T get() {
-        return value;
-    }
-
-    public void setValue(T value) {
-        this.value = value;
-    }
+@Deprecated
+public class Option<T> extends com.jd.laf.extension.Option<T> {
 
 }

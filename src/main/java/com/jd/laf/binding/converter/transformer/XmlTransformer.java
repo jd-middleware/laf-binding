@@ -5,7 +5,8 @@ import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.Transformer;
 import com.jd.laf.binding.marshaller.Unmarshaller;
 import com.jd.laf.binding.marshaller.XmlProvider;
-import com.jd.laf.binding.marshaller.XmlProviders;
+
+import static com.jd.laf.binding.Plugin.XML;
 
 /**
  * XML转换器
@@ -25,7 +26,7 @@ public class XmlTransformer implements Transformer {
     @Override
     public Object execute(final Conversion conversion) throws Exception {
         //获取JSON插件
-        XmlProvider plugin = XmlProviders.getPlugin();
+        XmlProvider plugin = XML.get();
         Unmarshaller unmarshaller = plugin == null ? null : plugin.getUnmarshaller();
         if (unmarshaller == null) {
             return null;
