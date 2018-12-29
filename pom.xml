@@ -24,13 +24,13 @@
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <junit.version>4.12</junit.version>
-        <laf-extension.version>1.0.7</laf-extension.version>
+        <laf-extension.version>1.0.7-SNAPSHOT</laf-extension.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.jd.laf</groupId>
-            <artifactId>laf-extension</artifactId>
+            <artifactId>laf-extension-core</artifactId>
             <version>${laf-extension.version}</version>
         </dependency>
         <dependency>
