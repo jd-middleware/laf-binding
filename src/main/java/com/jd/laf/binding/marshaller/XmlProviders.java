@@ -5,6 +5,7 @@ import static com.jd.laf.binding.Plugin.XML;
 /**
  * Xml序列化插件管理器
  */
+@Deprecated
 public abstract class XmlProviders {
 
     /**
