@@ -4,6 +4,7 @@ import com.jd.laf.binding.binder.Binder;
 import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.marshaller.JsonProvider;
 import com.jd.laf.binding.marshaller.XmlProvider;
+import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.PropertySupplier;
 import com.jd.laf.binding.reflect.PropertySupplier.MethodSupplier;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
@@ -34,6 +35,11 @@ public interface Plugin {
             return obj.annotation();
         }
     });
+
+    /**
+     * 字段访问插件
+     */
+    ExtensionPoint<FieldAccessorFactory, String> FIELD = new ExtensionPointLazy<FieldAccessorFactory, String>(FieldAccessorFactory.class);
 
     //注解转换选择器
     ExtensionSelector<Transformer, Class<?>, ConversionType, Transformer> TRANSFORMER = new ExtensionSelector<Transformer, Class<?>, ConversionType, Transformer>(

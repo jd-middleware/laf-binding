@@ -7,7 +7,6 @@ import com.jd.laf.binding.converter.Scope;
 import com.jd.laf.binding.reflect.FieldAccessor;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.Reflect;
-import com.jd.laf.binding.reflect.ReflectAccessorFactory;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.annotation.Annotation;
@@ -19,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.jd.laf.binding.Plugin.BINDER;
+import static com.jd.laf.binding.Plugin.FIELD;
 import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.reflect.Fields.getFields;
 
@@ -41,7 +41,7 @@ public abstract class Binding {
      * @throws ReflectionException
      */
     public static boolean set(final Object target, final String field, final Object value) throws ReflectionException {
-        return set(target, field, value, ReflectAccessorFactory.getInstance());
+        return set(target, field, value, FIELD.get());
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class Binding {
      * @throws ReflectionException
      */
     public static boolean set(final Object target, final Field field, final Object value) throws ReflectionException {
-        return set(target, field, value, ReflectAccessorFactory.getInstance());
+        return set(target, field, value, FIELD.get());
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class Binding {
      * @throws ReflectionException
      */
     public static void bind(final Object source, final Object target) throws ReflectionException {
-        bind(source, target, ReflectAccessorFactory.getInstance());
+        bind(source, target, FIELD.get());
     }
 
     /**

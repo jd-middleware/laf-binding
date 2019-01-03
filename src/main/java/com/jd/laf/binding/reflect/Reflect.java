@@ -10,8 +10,7 @@ import com.jd.laf.binding.reflect.exception.ReflectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import static com.jd.laf.binding.Plugin.CONVERTER;
-import static com.jd.laf.binding.Plugin.PROPERTY;
+import static com.jd.laf.binding.Plugin.*;
 import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
@@ -110,7 +109,7 @@ public abstract class Reflect {
         if (field == null || target == null) {
             return false;
         }
-        return set(target, field, value, null, ReflectAccessorFactory.getInstance().getAccessor(field));
+        return set(target, field, value, null, FIELD.get().getAccessor(field));
     }
 
     /**

@@ -32,4 +32,9 @@ public class ReflectAccessorFactory implements FieldAccessorFactory {
         }
         return accessor;
     }
+
+    @Override
+    public String type() {
+        return "jdk";
+    }
 }
