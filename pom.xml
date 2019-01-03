@@ -6,12 +6,18 @@
 
     <groupId>com.jd.laf.binding</groupId>
     <artifactId>laf-binding</artifactId>
+    <packaging>pom</packaging>
     <version>1.0.3-SNAPSHOT</version>
 
     <organization>
         <name>JD.com, Inc.</name>
         <url>http://www.jd.com</url>
     </organization>
+    <modules>
+        <module>laf-binding-core</module>
+        <module>laf-binding-java8</module>
+        <module>laf-binding-fastjson</module>
+    </modules>
 
     <properties>
         <jdk.version>1.6</jdk.version>
@@ -27,19 +33,22 @@
         <laf-extension.version>1.0.7-SNAPSHOT</laf-extension.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.jd.laf</groupId>
-            <artifactId>laf-extension-core</artifactId>
-            <version>${laf-extension.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+
+        <dependencies>
+            <dependency>
+                <groupId>com.jd.laf</groupId>
+                <artifactId>laf-extension-core</artifactId>
+                <version>${laf-extension.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <resources>
@@ -114,16 +123,4 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>libs-releases-local</id>
-            <name>Release Repository</name>
-            <url>http://artifactory.jd.com/libs-releases-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>libs-snapshots-local</id>
-            <name>Snapshot Repository</name>
-            <url>http://artifactory.jd.com/libs-snapshots-local</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
