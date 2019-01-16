@@ -1,9 +1,7 @@
 package com.jd.laf.binding;
 
-import com.jd.laf.binding.annotation.JsonConverter;
 import com.jd.laf.binding.annotation.Value;
 import com.jd.laf.binding.annotation.XmlConverter;
-import com.jd.laf.binding.marshaller.XmlProviders;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,7 +35,7 @@ public class BindingTest {
         Assert.assertEquals(employee.getMyIds().length, 3);
         Assert.assertEquals(employee.getIdSet().size(), 3);
         Assert.assertEquals(employee.getToken(), "123");
-        Assert.assertEquals(employee.getIds1(),"1,2,3");
+        Assert.assertEquals(employee.getIds1(), "1,2,3");
 
     }
 
