@@ -35,6 +35,6 @@ public class AtomicBooleanConverter extends NumberConverter {
 
     @Override
     public Class<?> targetType() {
-        return Boolean.class;
+        return AtomicBoolean.class;
     }
 }

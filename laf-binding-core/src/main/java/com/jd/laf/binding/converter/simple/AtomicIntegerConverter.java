@@ -26,6 +26,6 @@ public class AtomicIntegerConverter extends NumberConverter {
 
     @Override
     public Class<?> targetType() {
-        return Long.class;
+        return AtomicInteger.class;
     }
 }

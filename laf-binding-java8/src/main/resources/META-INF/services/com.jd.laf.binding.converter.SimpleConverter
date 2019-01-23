@@ -1,4 +1,3 @@
-com.jd.laf.binding.converter.simple.DateTimeConverter
 com.jd.laf.binding.converter.simple.DurationConverter
 com.jd.laf.binding.converter.simple.InstantConverter
 com.jd.laf.binding.converter.simple.LocalDateConverter
