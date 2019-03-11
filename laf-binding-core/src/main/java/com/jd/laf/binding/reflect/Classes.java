@@ -22,16 +22,19 @@ public abstract class Classes {
         if (name == null) {
             return null;
         }
-        Class result;
-        try {
-            result = Class.forName(name);
-        } catch (ClassNotFoundException e) {
-            result = null;
-        }
-        Option<Class> option = new Option<Class>(result);
-        Option<Class> exists = map.putIfAbsent(name, option);
-        if (exists != null) {
-            option = exists;
+        Option<Class> option = map.get(name);
+        if (option == null) {
+            Class result;
+            try {
+                result = Class.forName(name);
+            } catch (ClassNotFoundException e) {
+                result = null;
+            }
+            option = new Option<Class>(result);
+            Option<Class> exists = map.putIfAbsent(name, option);
+            if (exists != null) {
+                option = exists;
+            }
         }
         return option.get();
     }
