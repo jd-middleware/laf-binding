@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import static com.jd.laf.binding.Plugin.*;
-import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.util.Primitive.inbox;
 
 /**
@@ -29,6 +28,19 @@ public abstract class Reflect {
      * @throws ReflectionException
      */
     public static Object evaluate(final Object target, final String expression, final FieldAccessorFactory factory) throws ReflectionException {
+        return get(target, expression, new PropertySupplier.FieldSupplier(factory));
+    }
+
+    /**
+     * 解析表达式，获取属性值
+     *
+     * @param target     目标对象
+     * @param expression 表达式
+     * @param supplier   字段访问
+     * @return
+     * @throws ReflectionException
+     */
+    public static Object evaluate(final Object target, final String expression, final PropertySupplier supplier) throws ReflectionException {
         if (target == null || expression == null) {
             return null;
         }
@@ -41,7 +53,7 @@ public abstract class Reflect {
                 name = name.substring(2, name.length() - 1);
             }
         }
-        Object value = get(target, name, factory);
+        Object value = get(target, name, supplier);
         if (value != null) {
             return value;
         }
@@ -54,7 +66,7 @@ public abstract class Reflect {
         int len = name.length();
         int start = 0;
         while (start < len) {
-            value = get(start == 0 ? target : value, name.substring(start, pos < 0 ? len : pos), factory);
+            value = get(start == 0 ? target : value, name.substring(start, pos < 0 ? len : pos), supplier);
             if (value == null) {
                 return null;
             } else {
@@ -76,17 +88,28 @@ public abstract class Reflect {
      * @throws ReflectionException
      */
     public static Object get(final Object target, final String name, final FieldAccessorFactory factory) throws ReflectionException {
-        if (target == null || name == null || name.isEmpty() || factory == null) {
+        return get(target, name, new PropertySupplier.FieldSupplier(factory));
+    }
+
+    /**
+     * 获取属性值
+     *
+     * @param target   目标对象
+     * @param name     表达式
+     * @param supplier 字段访问
+     * @return
+     * @throws ReflectionException
+     */
+    public static Object get(final Object target, final String name, final PropertySupplier supplier) throws ReflectionException {
+        if (target == null || name == null || name.isEmpty()) {
             return null;
         }
+        //判断该类型有自定义的属性提供者
         PropertySupplier getter = PROPERTY.select(target.getClass());
         try {
             Object result = getter == null ? null : getter.get(target, name);
-            if (result == null && Character.isJavaIdentifierStart(name.charAt(0))) {
-                Field field = getField(target.getClass(), name);
-                if (field != null) {
-                    return factory.getAccessor(field).get(target);
-                }
+            if (result == null && supplier != null) {
+                result = supplier.get(target, name);
             }
             return result;
         } catch (ReflectionException e) {
@@ -106,10 +129,11 @@ public abstract class Reflect {
      * @throws ReflectionException
      */
     public static boolean set(final Object target, final Field field, final Object value) throws ReflectionException {
-        if (field == null || target == null) {
+        if (field == null || target == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
-        return set(target, field, value, null, FIELD.get().getAccessor(field));
+        FieldAccessor accessor = FIELD.get().getAccessor(field);
+        return set(target, new FieldScope(field, accessor), value, null);
     }
 
     /**
@@ -125,10 +149,10 @@ public abstract class Reflect {
      */
     public static boolean set(final Object target, final Field field, final Object value, final Object format,
                               final FieldAccessorFactory factory) throws ReflectionException {
-        if (field == null || target == null || factory == null) {
+        if (field == null || target == null || factory == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
-        return set(target, field, value, format, factory.getAccessor(field));
+        return set(target, new FieldScope(field, factory.getAccessor(field)), value, format);
     }
 
     /**
@@ -143,10 +167,10 @@ public abstract class Reflect {
      */
     public static boolean set(final Object target, final Field field, final Object value,
                               final FieldAccessorFactory factory) throws ReflectionException {
-        if (field == null || target == null || factory == null) {
+        if (field == null || target == null || factory == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
-        return set(target, field, value, null, factory.getAccessor(field));
+        return set(target, new FieldScope(field, factory.getAccessor(field)), value, null);
     }
 
     /**
@@ -158,9 +182,11 @@ public abstract class Reflect {
      * @param accessor 字段访问对象
      * @throws ReflectionException
      */
-    public static boolean set(final Object target, final Field field, final Object value,
-                              final FieldAccessor accessor) throws ReflectionException {
-        return set(target, field, value, null, accessor);
+    public static boolean set(final Object target, final Field field, final Object value, final FieldAccessor accessor) throws ReflectionException {
+        if (field == null || target == null || accessor == null || Modifier.isFinal(field.getModifiers())) {
+            return false;
+        }
+        return set(target, new FieldScope(field, accessor), value, null);
     }
 
     /**
@@ -179,20 +205,35 @@ public abstract class Reflect {
         if (field == null || target == null || accessor == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
+        return set(target, new FieldScope(field, accessor), value, format);
+    }
+
+    /**
+     * 绑定字段
+     *
+     * @param target 目标对象
+     * @param value  字段值
+     * @param format 格式化信息
+     * @return 是否成功
+     * @throws ReflectionException
+     */
+    public static boolean set(final Object target, final Scope scope, final Object value, final Object format) throws ReflectionException {
+        if (scope == null || target == null) {
+            return false;
+        }
         try {
-            Class<?> type = field.getType();
+            Class<?> type = scope.getType();
             if (value == null) {
                 //值为空
                 if (type.isPrimitive()) {
                     //基本类型不能为空
                     return false;
                 }
-                accessor.set(target, null);
+                scope.update(target, null);
                 return true;
             }
-            Class<?> inboxTargetType = inbox(field.getType());
+            Class<?> inboxTargetType = inbox(scope.getType());
             Class<?> inboxSourceType = inbox(value.getClass());
-            FieldScope scope = new FieldScope(field);
             //获取转换器
             Converter operation = CONVERTER.select(new ConversionType(inboxSourceType, inboxTargetType, scope));
             if (operation != null) {
@@ -200,7 +241,7 @@ public abstract class Reflect {
                 Object obj = operation.execute(new Conversion(inboxSourceType, inboxTargetType, value, format, scope));
                 if (obj != null) {
                     //转换成功
-                    accessor.set(target, obj);
+                    scope.update(target, obj);
                     return true;
                 }
             }

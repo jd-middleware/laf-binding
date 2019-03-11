@@ -1,25 +1,27 @@
 package com.jd.laf.binding;
 
 
+import com.jd.laf.binding.annotation.Value;
 import com.jd.laf.binding.binder.Binder;
 import com.jd.laf.binding.binder.Binder.Context;
-import com.jd.laf.binding.binder.Binder.FieldContext;
 import com.jd.laf.binding.converter.Scope;
-import com.jd.laf.binding.reflect.FieldAccessor;
-import com.jd.laf.binding.reflect.FieldAccessorFactory;
-import com.jd.laf.binding.reflect.Reflect;
+import com.jd.laf.binding.converter.Scope.FieldScope;
+import com.jd.laf.binding.converter.Scope.ParameterScope;
+import com.jd.laf.binding.reflect.*;
+import com.jd.laf.binding.reflect.PropertySupplier.FieldSupplier;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
+import com.jd.laf.binding.util.Predicate;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.jd.laf.binding.Plugin.BINDER;
-import static com.jd.laf.binding.Plugin.FIELD;
+import static com.jd.laf.binding.Plugin.*;
 import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.reflect.Fields.getFields;
 
@@ -29,8 +31,11 @@ import static com.jd.laf.binding.reflect.Fields.getFields;
  */
 public abstract class Binding {
 
-    // 缓存类的绑定关系
-    protected static ConcurrentMap<Class<?>, List<BindingField>> bindingFields = new ConcurrentHashMap<Class<?>, List<BindingField>>();
+    // 缓存类的字段绑定关系
+    protected static ConcurrentMap<Class<?>, List<BindingScope>> FIELDS = new ConcurrentHashMap<Class<?>, List<BindingScope>>();
+
+    // 缓存方法的参数绑定关系
+    protected static ConcurrentMap<Method, List<BindingScope>> METHODS = new ConcurrentHashMap<Method, List<BindingScope>>();
 
     /**
      * 设置字段值
@@ -118,18 +123,18 @@ public abstract class Binding {
     }
 
     /**
-     * 绑定上下文
+     * 通过上下文，绑定字段
      *
      * @param source 上下文
      * @param target 对象
      * @throws ReflectionException
      */
     public static void bind(final Object source, final Object target) throws ReflectionException {
-        bind(source, target, FIELD.get());
+        bind(source, target, NoneFinalField.INSTANCE, FIELD.get());
     }
 
     /**
-     * 绑定上下文
+     * 通过上下文，绑定字段
      *
      * @param source  上下文
      * @param target  对象
@@ -137,23 +142,42 @@ public abstract class Binding {
      * @throws ReflectionException
      */
     public static void bind(final Object source, final Object target, final FieldAccessorFactory factory) throws ReflectionException {
-        if (source == null || target == null || factory == null) {
+        bind(source, target, NoneFinalField.INSTANCE, factory);
+    }
+
+    /**
+     * 通过上下文，绑定字段
+     *
+     * @param source    上下文
+     * @param target    对象
+     * @param predicate 预测
+     * @param factory   字段访问工厂类
+     * @throws ReflectionException
+     */
+    public static void bind(final Object source, final Object target, final Predicate<Field> predicate,
+                            final FieldAccessorFactory factory) throws ReflectionException {
+        if (source == null || target == null) {
             return;
         }
         Class<?> clazz = target.getClass();
         // 从缓存中获取
-        List<BindingField> bindings = bindingFields.get(clazz);
+        List<BindingScope> bindings = FIELDS.get(clazz);
         if (bindings == null) {
             // 没有找到则从注解中查找
-            bindings = new ArrayList<BindingField>();
+            bindings = new ArrayList<BindingScope>();
             Annotation[] annotations;
-            BindingField bindingField;
+            BindingScope bindingField;
             Binder binder;
+            //字段过滤
+            Predicate myPredicate = predicate == null ? NoneFinalField.INSTANCE : predicate;
+            FieldAccessorFactory myFactory = factory == null ? FIELD.get() : factory;
+            //获取所有字段
             List<Field> fields = getFields(clazz);
             if (fields != null) {
                 //遍历字段
                 for (Field field : fields) {
-                    if (Modifier.isFinal(field.getModifiers())) {
+                    //判断是否要过滤掉字段
+                    if (!myPredicate.test(field)) {
                         continue;
                     }
                     bindingField = null;
@@ -164,7 +188,8 @@ public abstract class Binding {
                         binder = BINDER.get(annotation.annotationType());
                         if (binder != null) {
                             if (bindingField == null) {
-                                bindingField = new BindingField(field, factory.getAccessor(field));
+                                bindingField = new BindingScope(new FieldScope(field, myFactory.getAccessor(field)),
+                                        new FieldSupplier(factory));
                             }
                             bindingField.add(new BinderAnnotation(annotation, binder));
                         }
@@ -175,46 +200,107 @@ public abstract class Binding {
                     }
                 }
             }
-            List<BindingField> exists = bindingFields.putIfAbsent(clazz, bindings);
+            List<BindingScope> exists = FIELDS.putIfAbsent(clazz, bindings);
             if (exists != null) {
                 bindings = exists;
             }
         }
-        for (BindingField binding : bindings) {
-            binding.bind(source, target, factory);
+        for (BindingScope binding : bindings) {
+            binding.bind(source, target);
         }
     }
 
     /**
-     * 绑定字段
+     * 绑定参数上下文
+     *
+     * @param source   上下文
+     * @param method   方法
+     * @param supplier 参数值提供者
+     * @throws ReflectionException
      */
-    protected static class BindingField implements FieldAccessor {
+    public static Object[] bind(final Object source, final Method method, final PropertySupplier supplier) throws ReflectionException {
+        if (source == null || method == null) {
+            return null;
+        }
+        MethodFactory methodFactory = METHOD_FACTORY.get();
+        Object[] args = new Object[methodFactory.getParameterCount(method)];
+        // 从缓存中获取
+        List<BindingScope> bindings = FIELDS.get(method);
+        if (bindings == null) {
+            // 没有找到则从注解中查找
+            bindings = new ArrayList<BindingScope>();
+            Annotation[] annotations;
+            BindingScope bindingScope;
+            Binder binder;
+            List<MethodParameter> parameters = methodFactory.getParameters(method);
+            //遍历字段
+            for (final MethodParameter parameter : parameters) {
+                bindingScope = new BindingScope(new ParameterScope(parameter), supplier);
+                //遍历注解
+                annotations = parameter.getAnnotations();
+                for (Annotation annotation : annotations) {
+                    //是否是绑定注解
+                    binder = BINDER.get(annotation.annotationType());
+                    if (binder != null) {
+                        bindingScope.add(new BinderAnnotation(annotation, binder));
+                    }
+                }
+                if (bindingScope.isEmpty()) {
+                    //添加默认绑定注解
+                    bindingScope.add(new BinderAnnotation(new Value() {
+                        @Override
+                        public String value() {
+                            return parameter.getName();
+                        }
+
+                        @Override
+                        public String format() {
+                            return "";
+                        }
+
+                        @Override
+                        public boolean nullable() {
+                            return false;
+                        }
+
+                        @Override
+                        public String defaultValue() {
+                            return "";
+                        }
+
+                        @Override
+                        public Class<? extends Annotation> annotationType() {
+                            return Value.class;
+                        }
+                    }, BINDER.get(Value.class)));
+                }
+                bindings.add(bindingScope);
+            }
+            List<BindingScope> exists = METHODS.putIfAbsent(method, bindings);
+            if (exists != null) {
+                bindings = exists;
+            }
+        }
+        for (BindingScope binding : bindings) {
+            binding.bind(source, args);
+        }
+        return args;
+    }
+
+    /**
+     * 绑定作用域
+     */
+    protected static class BindingScope {
         //字段
-        final protected Field field;
-        //绑定实现
-        final protected List<BinderAnnotation> annotations = new ArrayList<BinderAnnotation>(2);
+        protected final Scope scope;
         //字段访问器
-        final protected FieldAccessor accessor;
+        protected final PropertySupplier supplier;
+        //绑定实现
+        protected final List<BinderAnnotation> annotations = new ArrayList<BinderAnnotation>(2);
 
-        public BindingField(Field field, FieldAccessor accessor) {
-            this.field = field;
-            this.accessor = accessor;
-        }
-
-        public Field getField() {
-            return field;
-        }
-
-        public Class<?> getType() {
-            return field.getType();
-        }
-
-        public FieldAccessor getAccessor() {
-            return accessor;
-        }
-
-        public List<BinderAnnotation> getAnnotations() {
-            return annotations;
+        public BindingScope(Scope scope, PropertySupplier supplier) {
+            this.scope = scope;
+            this.supplier = supplier;
         }
 
         public void add(final BinderAnnotation annotation) {
@@ -223,14 +309,8 @@ public abstract class Binding {
             }
         }
 
-        @Override
-        public Object get(final Object target) throws ReflectionException {
-            return accessor.get(target);
-        }
-
-        @Override
-        public void set(Object target, Object value) throws ReflectionException {
-            accessor.set(target, value);
+        public boolean isEmpty() {
+            return annotations.isEmpty();
         }
 
         /**
@@ -238,13 +318,12 @@ public abstract class Binding {
          *
          * @param source
          * @param target
-         * @param factory
          * @throws ReflectionException
          */
-        public void bind(final Object source, final Object target, final FieldAccessorFactory factory) throws ReflectionException {
+        public void bind(final Object source, final Object target) throws ReflectionException {
             Context context;
             for (BinderAnnotation annotation : annotations) {
-                context = new FieldContext(source, target, annotation.annotation, field, factory);
+                context = new Context(source, target, annotation.annotation, scope, supplier);
                 if (annotation.binder.bind(context)) {
                     return;
                 }
@@ -256,9 +335,9 @@ public abstract class Binding {
     /**
      * 注解绑定器
      */
-    public static class BinderAnnotation {
-        final protected Annotation annotation;
-        final protected Binder binder;
+    protected static class BinderAnnotation {
+        protected final Annotation annotation;
+        protected final Binder binder;
 
         public BinderAnnotation(Annotation annotation, Binder binder) {
             this.annotation = annotation;
@@ -271,6 +350,19 @@ public abstract class Binding {
 
         public Binder getBinder() {
             return binder;
+        }
+    }
+
+    /**
+     * 字段过滤
+     */
+    public static class NoneFinalField implements Predicate<Field> {
+
+        public static final Predicate<Field> INSTANCE = new NoneFinalField();
+
+        @Override
+        public boolean test(Field obj) {
+            return !Modifier.isFinal(obj.getModifiers());
         }
     }
 

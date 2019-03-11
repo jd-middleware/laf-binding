@@ -1,15 +1,24 @@
 package com.jd.laf.binding.converter;
 
+import com.jd.laf.binding.reflect.FieldAccessor;
 import com.jd.laf.binding.reflect.Generics;
+import com.jd.laf.binding.reflect.MethodParameter;
+import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * 作用域
  */
 public interface Scope {
+
+    /**
+     * 获取名称
+     *
+     * @return
+     */
+    String getName();
 
     /**
      * 获取注解
@@ -26,6 +35,13 @@ public interface Scope {
     Class getGenericType();
 
     /**
+     * 获取类型
+     *
+     * @return
+     */
+    Class getType();
+
+    /**
      * 返回目标对象
      *
      * @return
@@ -33,24 +49,62 @@ public interface Scope {
     Object target();
 
     /**
-     * 字段作用域
+     * 更新
+     *
+     * @param target
+     * @param value
+     * @throws ReflectionException
      */
-    class FieldScope implements Scope {
-        //字段
-        protected final Field field;
+    void update(Object target, Object value) throws ReflectionException;
 
-        public FieldScope(Field field) {
-            this.field = field;
+    /**
+     * 抽象作用域
+     */
+    abstract class AbstractScope implements Scope {
+        //注解
+        protected final Annotation[] annotations;
+        //泛型
+        protected final Class genericType;
+
+        public AbstractScope(Annotation[] annotations, Class genericType) {
+            this.annotations = annotations;
+            this.genericType = genericType;
         }
 
         @Override
         public Annotation[] getAnnotations() {
-            return field.getAnnotations();
+            return annotations;
         }
 
         @Override
         public Class getGenericType() {
-            return Generics.getGenericType(field.getGenericType());
+            return genericType;
+        }
+
+    }
+
+    /**
+     * 字段作用域
+     */
+    class FieldScope extends AbstractScope {
+        //字段
+        protected final Field field;
+        protected final FieldAccessor accessor;
+
+        public FieldScope(final Field field, final FieldAccessor accessor) {
+            super(field.getAnnotations(), Generics.getGenericType(field.getGenericType()));
+            this.field = field;
+            this.accessor = accessor;
+        }
+
+        @Override
+        public String getName() {
+            return field.getName();
+        }
+
+        @Override
+        public Class getType() {
+            return field.getType();
         }
 
         @Override
@@ -76,6 +130,11 @@ public interface Scope {
         public int hashCode() {
             return field.hashCode();
         }
+
+        @Override
+        public void update(final Object target, final Object value) throws ReflectionException {
+            accessor.set(target, value);
+        }
     }
 
     /**
@@ -83,42 +142,35 @@ public interface Scope {
      */
     class ParameterScope implements Scope {
         //方法
-        protected final Method method;
-        //参数序号
-        protected final int argument;
-        //注解
-        protected final Annotation[] annotations;
-        //泛型
-        protected final Class genericType;
+        protected final MethodParameter parameter;
 
-        public ParameterScope(Method method) {
-            this(method, 0);
+        public ParameterScope(MethodParameter parameter) {
+            this.parameter = parameter;
         }
 
-        public ParameterScope(Method method, int argument) {
-            this.method = method;
-            this.argument = argument;
-            this.annotations = method.getParameterAnnotations()[argument];
-            this.genericType = Generics.getGenericType(method.getGenericParameterTypes()[argument]);
+        @Override
+        public String getName() {
+            return parameter.getName();
         }
 
         @Override
         public Annotation[] getAnnotations() {
-            return annotations;
+            return parameter.getAnnotations();
+        }
+
+        @Override
+        public Class getType() {
+            return parameter.getType();
         }
 
         @Override
         public Class getGenericType() {
-            return genericType;
+            return parameter.getGenericType();
         }
 
         @Override
         public Object target() {
-            return method;
-        }
-
-        public int getArgument() {
-            return argument;
+            return parameter.target();
         }
 
         @Override
@@ -132,17 +184,20 @@ public interface Scope {
 
             ParameterScope that = (ParameterScope) o;
 
-            if (argument != that.argument) {
-                return false;
-            }
-            return method.equals(that.method);
+            return parameter.equals(that.parameter);
         }
 
         @Override
         public int hashCode() {
-            int result = method.hashCode();
-            result = 31 * result + argument;
-            return result;
+            return parameter.hashCode();
+        }
+
+        @Override
+        public void update(final Object target, final Object value) throws ReflectionException {
+            //原始对象是参数数组，设置参数值
+            if (target != null) {
+                ((Object[]) target)[parameter.getIndex()] = value;
+            }
         }
     }
 }

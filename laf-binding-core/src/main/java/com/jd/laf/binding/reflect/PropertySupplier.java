@@ -1,6 +1,9 @@
 package com.jd.laf.binding.reflect;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import static com.jd.laf.binding.reflect.Fields.getField;
 
 /**
  * 属性获取器
@@ -26,6 +29,34 @@ public interface PropertySupplier {
     boolean support(Class<?> clazz);
 
     /**
+     * 字段属性提供者
+     */
+    class FieldSupplier implements PropertySupplier {
+
+        protected FieldAccessorFactory factory;
+
+        public FieldSupplier(FieldAccessorFactory factory) {
+            this.factory = factory;
+        }
+
+        @Override
+        public Object get(final Object target, final String name) throws Exception {
+            if (factory != null && Character.isJavaIdentifierStart(name.charAt(0))) {
+                Field field = getField(target.getClass(), name);
+                if (field != null) {
+                    return factory.getAccessor(field).get(target);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public boolean support(final Class<?> clazz) {
+            return true;
+        }
+    }
+
+    /**
      * 根据反射方法来调用
      */
     class MethodSupplier implements PropertySupplier {
@@ -42,7 +73,7 @@ public interface PropertySupplier {
         }
 
         @Override
-        public boolean support(Class<?> clazz) {
+        public boolean support(final Class<?> clazz) {
             return true;
         }
     }

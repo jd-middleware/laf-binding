@@ -5,6 +5,7 @@ import com.jd.laf.binding.converter.*;
 import com.jd.laf.binding.marshaller.JsonProvider;
 import com.jd.laf.binding.marshaller.XmlProvider;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
+import com.jd.laf.binding.reflect.MethodFactory;
 import com.jd.laf.binding.reflect.PropertySupplier;
 import com.jd.laf.binding.reflect.PropertySupplier.MethodSupplier;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
@@ -24,6 +25,8 @@ import static com.jd.laf.binding.converter.Converter.NONE;
 public interface Plugin {
 
     String GET_OBJECT = "getObject";
+
+    ExtensionPoint<MethodFactory, String> METHOD_FACTORY = new ExtensionPointLazy<MethodFactory, String>(MethodFactory.class);
 
     ExtensionPoint<JsonProvider, String> JSON = new ExtensionPointLazy(JsonProvider.class);
 

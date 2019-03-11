@@ -1,6 +1,10 @@
 package com.jd.laf.binding.binder;
 
+import com.jd.laf.binding.converter.Scope;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
+import com.jd.laf.binding.reflect.MethodParameter;
+import com.jd.laf.binding.reflect.PropertySupplier;
+import com.jd.laf.binding.reflect.PropertySupplier.FieldSupplier;
 import com.jd.laf.binding.reflect.Reflect;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
@@ -31,7 +35,7 @@ public interface Binder {
     /**
      * 绑定上下文
      */
-    abstract class Context {
+    class Context {
 
         //源对象
         protected Object source;
@@ -39,11 +43,17 @@ public interface Binder {
         protected Object target;
         //绑定注解
         protected Annotation annotation;
+        //作用域
+        protected Scope scope;
+        //属性提供者
+        protected PropertySupplier supplier;
 
-        public Context(final Object source, final Object target, final Annotation annotation) {
+        public Context(Object source, Object target, Annotation annotation, Scope scope, PropertySupplier supplier) {
             this.source = source;
             this.target = target;
             this.annotation = annotation;
+            this.scope = scope;
+            this.supplier = supplier;
         }
 
         public Object getSource() {
@@ -58,19 +68,27 @@ public interface Binder {
             return annotation;
         }
 
+        public Scope getScope() {
+            return scope;
+        }
+
         /**
          * 获取名称
          *
          * @return
          */
-        public abstract String getName();
+        public String getName() {
+            return scope.getName();
+        }
 
         /**
          * 获取类型
          *
          * @return
          */
-        public abstract Class<?> getType();
+        public Class<?> getType() {
+            return scope.getType();
+        }
 
         /**
          * 获取指定名称的值
@@ -78,7 +96,9 @@ public interface Binder {
          * @param name 名称
          * @return
          */
-        public abstract Object evaluate(final String name) throws ReflectionException;
+        public Object evaluate(final String name) throws ReflectionException {
+            return Reflect.evaluate(source, name, supplier);
+        }
 
         /**
          * 设置值
@@ -87,7 +107,9 @@ public interface Binder {
          * @return
          * @throws ReflectionException
          */
-        public abstract boolean bind(final Object value) throws ReflectionException;
+        public boolean bind(final Object value) throws ReflectionException {
+            return bind(value, null);
+        }
 
         /**
          * 设置值
@@ -97,7 +119,9 @@ public interface Binder {
          * @return
          * @throws ReflectionException
          */
-        public abstract boolean bind(final Object value, final String format) throws ReflectionException;
+        public boolean bind(final Object value, final String format) throws ReflectionException {
+            return Reflect.set(target, scope, value, format);
+        }
     }
 
 
@@ -106,44 +130,23 @@ public interface Binder {
      */
     class FieldContext extends Context {
 
-        //字段
-        protected Field field;
-        //字段访问器
-        protected FieldAccessorFactory factory;
-
         public FieldContext(final Object source, final Object target, final Annotation annotation, final Field field, final FieldAccessorFactory factory) {
-            super(source, target, annotation);
-            this.field = field;
-            this.factory = factory;
-        }
+            super(source, target, annotation, new Scope.FieldScope(field, factory.getAccessor(field)), new FieldSupplier(factory));
 
-        public Field getField() {
-            return field;
         }
+    }
 
-        @Override
-        public String getName() {
-            return field.getName();
-        }
+    /**
+     * 方法参数上下文
+     */
+    class ParameterContext extends Context {
+        //方法参数
+        protected MethodParameter parameter;
 
-        @Override
-        public Class<?> getType() {
-            return field.getType();
-        }
-
-        @Override
-        public Object evaluate(final String name) throws ReflectionException {
-            return Reflect.evaluate(source, name, factory);
-        }
-
-        @Override
-        public boolean bind(final Object value) throws ReflectionException {
-            return Reflect.set(target, field, value, factory);
-        }
-
-        @Override
-        public boolean bind(final Object value, final String format) throws ReflectionException {
-            return Reflect.set(target, field, value, format, factory);
+        public ParameterContext(final Object source, final Object target, final Annotation annotation,
+                                final PropertySupplier supplier, final MethodParameter parameter) {
+            super(source, target, annotation, new Scope.ParameterScope(parameter), supplier);
+            this.parameter = parameter;
         }
     }
 }
