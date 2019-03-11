@@ -7,7 +7,7 @@
     <groupId>com.jd.laf.binding</groupId>
     <artifactId>laf-binding</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
 
     <organization>
         <name>JD.com, Inc.</name>
@@ -30,7 +30,7 @@
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <junit.version>4.12</junit.version>
-        <laf-extension.version>1.0.12</laf-extension.version>
+        <laf-extension.version>1.0.13</laf-extension.version>
     </properties>
 
     <dependencyManagement>

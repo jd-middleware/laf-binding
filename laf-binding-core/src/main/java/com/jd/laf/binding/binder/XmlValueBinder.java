@@ -6,11 +6,7 @@ import com.jd.laf.binding.marshaller.XmlProvider;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
-import java.lang.reflect.Field;
-
 import static com.jd.laf.binding.Plugin.XML;
-import static com.jd.laf.binding.reflect.Reflect.evaluate;
-import static com.jd.laf.binding.reflect.Reflect.set;
 
 /**
  * 值绑定
@@ -23,14 +19,10 @@ public class XmlValueBinder implements Binder {
             return false;
         }
         XmlValue value = (XmlValue) context.getAnnotation();
-        FieldAccessorFactory factory = context.getFactory();
-        Object target = context.getTarget();
-        Object source = context.getSource();
         //字段名
-        Field field = context.getField();
-        String name = value.value() == null || value.value().isEmpty() ? field.getName() : value.value();
+        String name = value.value() == null || value.value().isEmpty() ? context.getName() : value.value();
         //获取属性值
-        Object result = evaluate(source, name, factory);
+        Object result = context.evaluate(name);
         if (!value.nullable() && result == null) {
             //判断不能为空
             return false;
@@ -46,8 +38,8 @@ public class XmlValueBinder implements Binder {
         }
         //反序列化
         try {
-            result = unmarshaller.unmarshall(result.toString(), field.getType(), null);
-            return set(target, field, result, null, factory);
+            result = unmarshaller.unmarshall(result.toString(), context.getType(), null);
+            return context.bind(result);
         } catch (ReflectionException e) {
             throw e;
         } catch (Exception e) {

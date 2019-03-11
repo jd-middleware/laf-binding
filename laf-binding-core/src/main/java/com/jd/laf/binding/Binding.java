@@ -3,6 +3,7 @@ package com.jd.laf.binding;
 
 import com.jd.laf.binding.binder.Binder;
 import com.jd.laf.binding.binder.Binder.Context;
+import com.jd.laf.binding.binder.Binder.FieldContext;
 import com.jd.laf.binding.converter.Scope;
 import com.jd.laf.binding.reflect.FieldAccessor;
 import com.jd.laf.binding.reflect.FieldAccessorFactory;
@@ -243,7 +244,7 @@ public abstract class Binding {
         public void bind(final Object source, final Object target, final FieldAccessorFactory factory) throws ReflectionException {
             Context context;
             for (BinderAnnotation annotation : annotations) {
-                context = new Context(target, field, annotation.annotation, factory, source);
+                context = new FieldContext(source, target, annotation.annotation, field, factory);
                 if (annotation.binder.bind(context)) {
                     return;
                 }
@@ -255,7 +256,7 @@ public abstract class Binding {
     /**
      * 注解绑定器
      */
-    protected static class BinderAnnotation {
+    public static class BinderAnnotation {
         final protected Annotation annotation;
         final protected Binder binder;
 

@@ -1,13 +1,7 @@
 package com.jd.laf.binding.binder;
 
 import com.jd.laf.binding.annotation.Value;
-import com.jd.laf.binding.reflect.FieldAccessorFactory;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
-
-import java.lang.reflect.Field;
-
-import static com.jd.laf.binding.reflect.Reflect.evaluate;
-import static com.jd.laf.binding.reflect.Reflect.set;
 
 /**
  * 值绑定
@@ -20,14 +14,10 @@ public class ValueBinder implements Binder {
             return false;
         }
         Value value = (Value) context.getAnnotation();
-        FieldAccessorFactory factory = context.getFactory();
-        Object target = context.getTarget();
-        Object source = context.getSource();
         //字段名
-        Field field = context.getField();
-        String name = value.value() == null || value.value().isEmpty() ? field.getName() : value.value();
+        String name = value.value() == null || value.value().isEmpty() ? context.getName() : value.value();
         //获取属性值
-        Object result = evaluate(source, name, factory);
+        Object result = context.evaluate(name);
         if (result == null) {
             //为空，获取默认值
             String defaultValue = value.defaultValue();
@@ -39,7 +29,7 @@ public class ValueBinder implements Binder {
             //判断不能为空
             return false;
         }
-        return set(target, field, result, value.format(), factory);
+        return context.bind(result, value.format());
     }
 
     @Override
