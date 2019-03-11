@@ -20,8 +20,9 @@ public class Java8MethodFactory implements MethodFactory {
         if (method == null) {
             return null;
         }
-        List<MethodParameter> result = new ArrayList<>(method.getParameterCount());
-        if (result.size() > 0) {
+        int count = method.getParameterCount();
+        List<MethodParameter> result = new ArrayList<>(count);
+        if (count > 0) {
             Parameter[] parameters = method.getParameters();
             for (int i = 0; i < parameters.length; i++) {
                 result.add(new Java8Parameter(method, i, parameters[i]));
