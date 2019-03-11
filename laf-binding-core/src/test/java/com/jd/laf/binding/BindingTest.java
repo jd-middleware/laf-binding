@@ -82,15 +82,15 @@ public class BindingTest {
     @Test
     public void testParameters() throws ReflectionException, NoSuchMethodException {
 
-        Method method = BindingTest.class.getDeclaredMethod("annotation", int.class, int.class);
+        Method method = BindingTest.class.getDeclaredMethod("annotation", int.class, int.class, int.class);
 
         //context已经有字段获取方法getObject
         Object[] args = Binding.bind(new Context(), method);
-        Assert.assertArrayEquals(args, new Object[]{10, 10});
+        Assert.assertArrayEquals(args, new Object[]{10, 10, 20});
 
     }
 
-    protected void annotation(@Value("age") int p1, @Value("age") int p2) {
+    protected void annotation(@Value("age") int p1, @Value("age") int p2, int param2) {
 
     }
 
@@ -302,6 +302,8 @@ public class BindingTest {
         public Object getObject(String name) {
             if ("age".equals(name)) {
                 return 10;
+            } else if ("param2".equals(name)) {
+                return 20;
             }
             return null;
         }
