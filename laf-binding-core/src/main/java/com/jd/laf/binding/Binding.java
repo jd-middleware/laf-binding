@@ -213,9 +213,20 @@ public abstract class Binding {
     /**
      * 绑定参数上下文
      *
+     * @param source 上下文
+     * @param method 方法
+     * @throws ReflectionException
+     */
+    public static Object[] bind(final Object source, final Method method) throws ReflectionException {
+        return bind(source, method, (PropertySupplier) null);
+    }
+
+    /**
+     * 绑定参数上下文
+     *
      * @param source   上下文
      * @param method   方法
-     * @param supplier 参数值提供者
+     * @param supplier 可选参数值提供者
      * @throws ReflectionException
      */
     public static Object[] bind(final Object source, final Method method, final PropertySupplier supplier) throws ReflectionException {

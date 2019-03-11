@@ -72,6 +72,10 @@ public interface Binder {
             return scope;
         }
 
+        public PropertySupplier getSupplier() {
+            return supplier;
+        }
+
         /**
          * 获取名称
          *

@@ -28,6 +28,15 @@ public interface PropertySupplier {
      */
     boolean support(Class<?> clazz);
 
+
+    abstract class AbstractSupplier implements PropertySupplier {
+
+        @Override
+        public boolean support(final Class<?> clazz) {
+            return true;
+        }
+    }
+
     /**
      * 字段属性提供者
      */

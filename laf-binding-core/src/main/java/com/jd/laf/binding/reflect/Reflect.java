@@ -36,7 +36,7 @@ public abstract class Reflect {
      *
      * @param target     目标对象
      * @param expression 表达式
-     * @param supplier   字段访问
+     * @param supplier   可选字段访问
      * @return
      * @throws ReflectionException
      */

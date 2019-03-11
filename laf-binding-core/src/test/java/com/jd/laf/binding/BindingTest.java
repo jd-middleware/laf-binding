@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class BindingTest {
@@ -76,6 +77,21 @@ public class BindingTest {
         Employee employee = new Employee();
         Binding.bind(new Context(), employee);
         Assert.assertEquals(employee.age, 10);
+    }
+
+    @Test
+    public void testParameters() throws ReflectionException, NoSuchMethodException {
+
+        Method method = BindingTest.class.getDeclaredMethod("annotation", int.class, int.class);
+
+        //context已经有字段获取方法getObject
+        Object[] args = Binding.bind(new Context(), method);
+        Assert.assertArrayEquals(args, new Object[]{10, 10});
+
+    }
+
+    protected void annotation(@Value("age") int p1, @Value("age") int p2) {
+
     }
 
     public void testBindPerformance() throws ReflectionException {
