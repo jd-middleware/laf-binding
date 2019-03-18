@@ -33,7 +33,7 @@ public interface MethodParameter {
      *
      * @return
      */
-    Class<?> getGenericType();
+    GenericMeta[] getGenericMetas();
 
     /**
      * 获取注解

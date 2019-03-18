@@ -1,32 +1,36 @@
 package com.jd.laf.binding.reflect;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import com.jd.laf.binding.util.Function;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static com.jd.laf.binding.util.Collections.computeIfAbsent;
 
 /**
  * 泛型工具
  */
 public abstract class Generics {
 
+    protected static final ConcurrentMap<Class, GenericClass> classGeneric = new ConcurrentHashMap<Class, GenericClass>();
+
+
     /**
-     * 获取泛型
+     * 获取泛型信息
      *
-     * @param type
+     * @param clazz
      * @return
      */
-    public static Class getGenericType(final Type type) {
-        if (type == null) {
+    public static GenericClass get(final Class clazz) {
+        if (clazz == null) {
             return null;
         }
-        // 如果是泛型参数的类型
-        if (type instanceof ParameterizedType) {
-            //得到泛型里的class类型对象
-            Type actualType = ((ParameterizedType) type).getActualTypeArguments()[0];
-            if (actualType instanceof Class) {
-                return (Class) actualType;
+        return computeIfAbsent(classGeneric, clazz, new Function<Class, GenericClass>() {
+            @Override
+            public GenericClass apply(Class key) {
+                return new GenericClass(clazz);
             }
-        }
-        return null;
+        });
     }
 
 }

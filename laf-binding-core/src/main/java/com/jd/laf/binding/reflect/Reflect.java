@@ -133,7 +133,7 @@ public abstract class Reflect {
             return false;
         }
         FieldAccessor accessor = FIELD.get().getAccessor(field);
-        return set(target, new FieldScope(field, accessor), value, null);
+        return set(target, new FieldScope(target.getClass(), field, accessor), value, null);
     }
 
     /**
@@ -152,7 +152,7 @@ public abstract class Reflect {
         if (field == null || target == null || factory == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
-        return set(target, new FieldScope(field, factory.getAccessor(field)), value, format);
+        return set(target, new FieldScope(target.getClass(), field, factory.getAccessor(field)), value, format);
     }
 
     /**
@@ -170,7 +170,7 @@ public abstract class Reflect {
         if (field == null || target == null || factory == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
-        return set(target, new FieldScope(field, factory.getAccessor(field)), value, null);
+        return set(target, new FieldScope(target.getClass(), field, factory.getAccessor(field)), value, null);
     }
 
     /**
@@ -186,7 +186,7 @@ public abstract class Reflect {
         if (field == null || target == null || accessor == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
-        return set(target, new FieldScope(field, accessor), value, null);
+        return set(target, new FieldScope(target.getClass(), field, accessor), value, null);
     }
 
     /**
@@ -205,7 +205,7 @@ public abstract class Reflect {
         if (field == null || target == null || accessor == null || Modifier.isFinal(field.getModifiers())) {
             return false;
         }
-        return set(target, new FieldScope(field, accessor), value, format);
+        return set(target, new FieldScope(target.getClass(), field, accessor), value, format);
     }
 
     /**
@@ -232,7 +232,12 @@ public abstract class Reflect {
                 scope.update(target, null);
                 return true;
             }
-            Class<?> inboxTargetType = inbox(scope.getType());
+            if (type == Object.class) {
+                //泛型
+                Class genericType = scope.getGenericType();
+                type = genericType != null ? genericType : type;
+            }
+            Class<?> inboxTargetType = inbox(type);
             Class<?> inboxSourceType = inbox(value.getClass());
             //获取转换器
             Converter operation = CONVERTER.select(new ConversionType(inboxSourceType, inboxTargetType, scope));

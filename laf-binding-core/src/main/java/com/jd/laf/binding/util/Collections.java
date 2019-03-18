@@ -2,6 +2,7 @@ package com.jd.laf.binding.util;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * 集合工具类
@@ -34,5 +35,27 @@ public abstract class Collections {
         } else {
             return (Collection) targetType.newInstance();
         }
+    }
+
+    /**
+     * 根据Key获取值，如果不存在则调用function创建
+     *
+     * @param map
+     * @param key
+     * @param function
+     * @param <K>
+     * @param <V>
+     * @return
+     */
+    public static <K, V> V computeIfAbsent(final ConcurrentMap<K, V> map, final K key, final Function<K, V> function) {
+        V result = map.get(key);
+        if (result == null) {
+            result = function.apply(key);
+            V exists = map.putIfAbsent(key, result);
+            if (exists != null) {
+                result = exists;
+            }
+        }
+        return result;
     }
 }

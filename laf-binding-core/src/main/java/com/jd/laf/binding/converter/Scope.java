@@ -1,6 +1,7 @@
 package com.jd.laf.binding.converter;
 
 import com.jd.laf.binding.reflect.FieldAccessor;
+import com.jd.laf.binding.reflect.GenericMeta;
 import com.jd.laf.binding.reflect.Generics;
 import com.jd.laf.binding.reflect.MethodParameter;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
@@ -28,7 +29,14 @@ public interface Scope {
     Annotation[] getAnnotations();
 
     /**
-     * 获取泛型
+     * 获取所有泛型信息
+     *
+     * @return
+     */
+    GenericMeta[] getGenericMetas();
+
+    /**
+     * 获取第一个泛型的类型
      *
      * @return
      */
@@ -62,14 +70,9 @@ public interface Scope {
      */
     abstract class AbstractScope implements Scope {
         //注解
-        protected final Annotation[] annotations;
+        protected Annotation[] annotations;
         //泛型
-        protected final Class genericType;
-
-        public AbstractScope(Annotation[] annotations, Class genericType) {
-            this.annotations = annotations;
-            this.genericType = genericType;
-        }
+        protected GenericMeta[] genericMetas;
 
         @Override
         public Annotation[] getAnnotations() {
@@ -77,24 +80,33 @@ public interface Scope {
         }
 
         @Override
-        public Class getGenericType() {
-            return genericType;
+        public GenericMeta[] getGenericMetas() {
+            return genericMetas;
         }
 
+        @Override
+        public Class getGenericType() {
+            return genericMetas.length != 1 ? null : genericMetas[0].getClazz();
+        }
     }
 
     /**
      * 字段作用域
      */
     class FieldScope extends AbstractScope {
+        //所属类型
+        protected Class owner;
         //字段
-        protected final Field field;
-        protected final FieldAccessor accessor;
+        protected Field field;
+        //访问器
+        protected FieldAccessor accessor;
 
-        public FieldScope(final Field field, final FieldAccessor accessor) {
-            super(field.getAnnotations(), Generics.getGenericType(field.getGenericType()));
+        public FieldScope(final Class owner, final Field field, final FieldAccessor accessor) {
+            this.annotations = field.getAnnotations();
+            this.owner = owner;
             this.field = field;
             this.accessor = accessor;
+            this.genericMetas = Generics.get(owner).get(field);
         }
 
         @Override
@@ -164,8 +176,14 @@ public interface Scope {
         }
 
         @Override
+        public GenericMeta[] getGenericMetas() {
+            return parameter.getGenericMetas();
+        }
+
+        @Override
         public Class getGenericType() {
-            return parameter.getGenericType();
+            GenericMeta[] genericMetas = getGenericMetas();
+            return genericMetas.length != 1 ? null : genericMetas[0].getClazz();
         }
 
         @Override

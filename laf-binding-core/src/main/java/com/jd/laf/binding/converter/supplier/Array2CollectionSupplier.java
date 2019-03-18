@@ -4,6 +4,7 @@ import com.jd.laf.binding.converter.Conversion;
 import com.jd.laf.binding.converter.ConversionType;
 import com.jd.laf.binding.converter.Converter;
 import com.jd.laf.binding.converter.ConverterSupplier;
+import com.jd.laf.binding.reflect.GenericMeta;
 import com.jd.laf.binding.reflect.array.ArrayObject;
 import com.jd.laf.binding.reflect.array.supplier.ArraySupplier;
 import com.jd.laf.binding.util.Collections;

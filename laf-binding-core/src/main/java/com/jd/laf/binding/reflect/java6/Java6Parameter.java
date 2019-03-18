@@ -1,32 +1,34 @@
 package com.jd.laf.binding.reflect.java6;
 
-import com.jd.laf.binding.reflect.Generics;
+import com.jd.laf.binding.reflect.GenericMeta;
 import com.jd.laf.binding.reflect.MethodParameter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 
 /**
  * Java6参数
  */
 public class Java6Parameter implements MethodParameter {
     //方法
-    protected final Method method;
-    protected final int index;
+    protected Method method;
+    protected int index;
     //名称
     protected String name;
-    protected final Class type;
-    protected final Class genericType;
-    protected final Annotation[] annotations;
+    //参数类型
+    protected Class type;
+    //泛型信息
+    protected GenericMeta[] genericMetas;
+    //注解信息
+    protected Annotation[] annotations;
 
-    public Java6Parameter(Method method, int index, String name, Class type, Type parameterType, Annotation[] annotations) {
+    public Java6Parameter(Method method, int index, String name, Class type, Annotation[] annotations, GenericMeta[] genericMetas) {
         this.method = method;
         this.index = index;
         this.name = name == null || name.isEmpty() ? "param" + index : name;
         this.type = type;
-        this.genericType = Generics.getGenericType(parameterType);
         this.annotations = annotations;
+        this.genericMetas = genericMetas;
     }
 
     @Override
@@ -45,8 +47,8 @@ public class Java6Parameter implements MethodParameter {
     }
 
     @Override
-    public Class<?> getGenericType() {
-        return genericType;
+    public GenericMeta[] getGenericMetas() {
+        return genericMetas;
     }
 
     @Override

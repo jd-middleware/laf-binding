@@ -1,5 +1,7 @@
 package com.jd.laf.binding.reflect.java8;
 
+import com.jd.laf.binding.reflect.GenericMeta;
+import com.jd.laf.binding.reflect.Generics;
 import com.jd.laf.binding.reflect.MethodFactory;
 import com.jd.laf.binding.reflect.MethodParameter;
 import com.jd.laf.extension.Extension;
@@ -16,16 +18,17 @@ import java.util.List;
 public class Java8MethodFactory implements MethodFactory {
 
     @Override
-    public List<MethodParameter> getParameters(final Method method) {
-        if (method == null) {
+    public List<MethodParameter> getParameters(final Class clazz, final Method method) {
+        if (method == null || clazz == null) {
             return null;
         }
         int count = method.getParameterCount();
         List<MethodParameter> result = new ArrayList<>(count);
         if (count > 0) {
             Parameter[] parameters = method.getParameters();
+            GenericMeta[][] genericMetas = Generics.get(clazz).get(method);
             for (int i = 0; i < parameters.length; i++) {
-                result.add(new Java8Parameter(method, i, parameters[i]));
+                result.add(new Java8Parameter(method, i, parameters[i], genericMetas[i]));
             }
         }
         return result;

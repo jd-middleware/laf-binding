@@ -85,9 +85,18 @@ public class BindingTest {
         Method method = BindingTest.class.getDeclaredMethod("annotation", int.class, int.class, int.class);
 
         //context已经有字段获取方法getObject
-        Object[] args = Binding.bind(new Context(), method);
+        Object[] args = Binding.bind(new Context(), this, method);
         Assert.assertArrayEquals(args, new Object[]{10, 10, 20});
 
+    }
+
+    @Test
+    public void testGenerics() throws NoSuchMethodException, ReflectionException {
+        Apple apple = new Apple();
+        Method method = apple.getClass().getDeclaredMethod("test", String.class, Integer.class);
+        //context已经有字段获取方法getObject
+        Object[] args = Binding.bind(new Context(), apple, method);
+        Assert.assertArrayEquals(args, new Object[]{"10", 10});
     }
 
     protected void annotation(@Value("age") int p1, @Value("age") int p2, int param2) {
@@ -308,6 +317,20 @@ public class BindingTest {
             return null;
         }
 
+    }
+
+    public interface Fruit<M, T> {
+
+        void test(M m, T t);
+
+    }
+
+    public static class Apple implements Fruit<String, Integer> {
+
+        @Override
+        public void test(@Value("age") String s, @Value("age") Integer integer) {
+
+        }
     }
 
 }

@@ -10,6 +10,7 @@ import com.jd.laf.binding.converter.Scope.ParameterScope;
 import com.jd.laf.binding.reflect.*;
 import com.jd.laf.binding.reflect.PropertySupplier.FieldSupplier;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
+import com.jd.laf.binding.util.Function;
 import com.jd.laf.binding.util.Predicate;
 
 import java.lang.annotation.Annotation;
@@ -24,6 +25,7 @@ import java.util.concurrent.ConcurrentMap;
 import static com.jd.laf.binding.Plugin.*;
 import static com.jd.laf.binding.reflect.Fields.getField;
 import static com.jd.laf.binding.reflect.Fields.getFields;
+import static com.jd.laf.binding.util.Collections.computeIfAbsent;
 
 /**
  * 绑定器
@@ -161,137 +163,138 @@ public abstract class Binding {
         }
         Class<?> clazz = target.getClass();
         // 从缓存中获取
-        List<BindingScope> bindings = FIELDS.get(clazz);
-        if (bindings == null) {
-            // 没有找到则从注解中查找
-            bindings = new ArrayList<BindingScope>();
-            Annotation[] annotations;
-            BindingScope bindingField;
-            Binder binder;
-            //字段过滤
-            Predicate myPredicate = predicate == null ? NoneFinalField.INSTANCE : predicate;
-            FieldAccessorFactory myFactory = factory == null ? FIELD.get() : factory;
-            //获取所有字段
-            List<Field> fields = getFields(clazz);
-            if (fields != null) {
-                //遍历字段
-                for (Field field : fields) {
-                    //判断是否要过滤掉字段
-                    if (!myPredicate.test(field)) {
-                        continue;
-                    }
-                    bindingField = null;
-                    //遍历注解
-                    annotations = field.getAnnotations();
-                    for (Annotation annotation : annotations) {
-                        //是否是绑定注解
-                        binder = BINDER.get(annotation.annotationType());
-                        if (binder != null) {
-                            if (bindingField == null) {
-                                bindingField = new BindingScope(new FieldScope(field, myFactory.getAccessor(field)),
-                                        new FieldSupplier(factory));
+        List<BindingScope> bindings = computeIfAbsent(FIELDS, clazz, new Function<Class<?>, List<BindingScope>>() {
+            @Override
+            public List<BindingScope> apply(final Class<?> clazz) {
+                // 没有找到则从注解中查找
+                List<BindingScope> bindings = new ArrayList<BindingScope>();
+                Annotation[] annotations;
+                BindingScope bindingField;
+                Binder binder;
+                //字段过滤
+                Predicate myPredicate = predicate == null ? NoneFinalField.INSTANCE : predicate;
+                FieldAccessorFactory myFactory = factory == null ? FIELD.get() : factory;
+                //获取所有字段
+                List<Field> fields = getFields(clazz);
+                if (fields != null) {
+                    //遍历字段
+                    for (Field field : fields) {
+                        //判断是否要过滤掉字段
+                        if (!myPredicate.test(field)) {
+                            continue;
+                        }
+                        bindingField = null;
+                        //遍历注解
+                        annotations = field.getAnnotations();
+                        for (Annotation annotation : annotations) {
+                            //是否是绑定注解
+                            binder = BINDER.get(annotation.annotationType());
+                            if (binder != null) {
+                                if (bindingField == null) {
+                                    bindingField = new BindingScope(new FieldScope(clazz, field, myFactory.getAccessor(field)),
+                                            new FieldSupplier(factory));
+                                }
+                                bindingField.add(new BinderAnnotation(annotation, binder));
                             }
-                            bindingField.add(new BinderAnnotation(annotation, binder));
+                        }
+                        //有绑定注解
+                        if (bindingField != null) {
+                            bindings.add(bindingField);
                         }
                     }
-                    //有绑定注解
-                    if (bindingField != null) {
-                        bindings.add(bindingField);
-                    }
                 }
+                return bindings;
             }
-            List<BindingScope> exists = FIELDS.putIfAbsent(clazz, bindings);
-            if (exists != null) {
-                bindings = exists;
-            }
-        }
+        });
         for (BindingScope binding : bindings) {
             binding.bind(source, target);
         }
     }
 
     /**
-     * 绑定参数上下文
+     * 绑定目标对象参数上下文
      *
      * @param source 上下文
+     * @param target 目标对象
      * @param method 方法
      * @throws ReflectionException
      */
-    public static Object[] bind(final Object source, final Method method) throws ReflectionException {
-        return bind(source, method, (PropertySupplier) null);
+    public static Object[] bind(final Object source, final Object target, final Method method) throws ReflectionException {
+        return bind(source, target, method, (PropertySupplier) null);
     }
 
     /**
      * 绑定参数上下文
      *
      * @param source   上下文
+     * @param target   目标对象
      * @param method   方法
      * @param supplier 可选参数值提供者
      * @throws ReflectionException
      */
-    public static Object[] bind(final Object source, final Method method, final PropertySupplier supplier) throws ReflectionException {
+    public static Object[] bind(final Object source, final Object target, final Method method, final PropertySupplier supplier) throws ReflectionException {
         if (source == null || method == null) {
             return null;
         }
-        MethodFactory methodFactory = METHOD_FACTORY.get();
+        final MethodFactory methodFactory = METHOD_FACTORY.get();
         Object[] args = new Object[methodFactory.getParameterCount(method)];
+
         // 从缓存中获取
-        List<BindingScope> bindings = FIELDS.get(method);
-        if (bindings == null) {
-            // 没有找到则从注解中查找
-            bindings = new ArrayList<BindingScope>();
-            Annotation[] annotations;
-            BindingScope bindingScope;
-            Binder binder;
-            List<MethodParameter> parameters = methodFactory.getParameters(method);
-            //遍历字段
-            for (final MethodParameter parameter : parameters) {
-                bindingScope = new BindingScope(new ParameterScope(parameter), supplier);
-                //遍历注解
-                annotations = parameter.getAnnotations();
-                for (Annotation annotation : annotations) {
-                    //是否是绑定注解
-                    binder = BINDER.get(annotation.annotationType());
-                    if (binder != null) {
-                        bindingScope.add(new BinderAnnotation(annotation, binder));
+        List<BindingScope> bindings = computeIfAbsent(METHODS, method, new Function<Method, List<BindingScope>>() {
+            @Override
+            public List<BindingScope> apply(final Method method) {
+                // 没有找到则从注解中查找
+                List<BindingScope> bindings = new ArrayList<BindingScope>();
+                Annotation[] annotations;
+                BindingScope bindingScope;
+                Binder binder;
+                List<MethodParameter> parameters = methodFactory.getParameters(target.getClass(), method);
+                //遍历字段
+                for (final MethodParameter parameter : parameters) {
+                    bindingScope = new BindingScope(new ParameterScope(parameter), supplier);
+                    //遍历注解
+                    annotations = parameter.getAnnotations();
+                    for (Annotation annotation : annotations) {
+                        //是否是绑定注解
+                        binder = BINDER.get(annotation.annotationType());
+                        if (binder != null) {
+                            bindingScope.add(new BinderAnnotation(annotation, binder));
+                        }
                     }
+                    if (bindingScope.isEmpty()) {
+                        //添加默认绑定注解
+                        bindingScope.add(new BinderAnnotation(new Value() {
+                            @Override
+                            public String value() {
+                                return parameter.getName();
+                            }
+
+                            @Override
+                            public String format() {
+                                return "";
+                            }
+
+                            @Override
+                            public boolean nullable() {
+                                return false;
+                            }
+
+                            @Override
+                            public String defaultValue() {
+                                return "";
+                            }
+
+                            @Override
+                            public Class<? extends Annotation> annotationType() {
+                                return Value.class;
+                            }
+                        }, BINDER.get(Value.class)));
+                    }
+                    bindings.add(bindingScope);
                 }
-                if (bindingScope.isEmpty()) {
-                    //添加默认绑定注解
-                    bindingScope.add(new BinderAnnotation(new Value() {
-                        @Override
-                        public String value() {
-                            return parameter.getName();
-                        }
-
-                        @Override
-                        public String format() {
-                            return "";
-                        }
-
-                        @Override
-                        public boolean nullable() {
-                            return false;
-                        }
-
-                        @Override
-                        public String defaultValue() {
-                            return "";
-                        }
-
-                        @Override
-                        public Class<? extends Annotation> annotationType() {
-                            return Value.class;
-                        }
-                    }, BINDER.get(Value.class)));
-                }
-                bindings.add(bindingScope);
+                return bindings;
             }
-            List<BindingScope> exists = METHODS.putIfAbsent(method, bindings);
-            if (exists != null) {
-                bindings = exists;
-            }
-        }
+        });
         for (BindingScope binding : bindings) {
             binding.bind(source, args);
         }

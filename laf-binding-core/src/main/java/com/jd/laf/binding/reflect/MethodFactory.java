@@ -14,10 +14,11 @@ public interface MethodFactory {
     /**
      * 构建方法参数
      *
-     * @param method
+     * @param clazz  实例化对象的类型
+     * @param method 方法
      * @return
      */
-    List<MethodParameter> getParameters(Method method);
+    List<MethodParameter> getParameters(Class clazz, Method method);
 
     /**
      * 返回参数数量

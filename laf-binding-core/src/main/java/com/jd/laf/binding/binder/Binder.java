@@ -1,15 +1,11 @@
 package com.jd.laf.binding.binder;
 
 import com.jd.laf.binding.converter.Scope;
-import com.jd.laf.binding.reflect.FieldAccessorFactory;
-import com.jd.laf.binding.reflect.MethodParameter;
 import com.jd.laf.binding.reflect.PropertySupplier;
-import com.jd.laf.binding.reflect.PropertySupplier.FieldSupplier;
 import com.jd.laf.binding.reflect.Reflect;
 import com.jd.laf.binding.reflect.exception.ReflectionException;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 
 /**
  * 绑定器
@@ -128,29 +124,4 @@ public interface Binder {
         }
     }
 
-
-    /**
-     * 字段绑定上下文
-     */
-    class FieldContext extends Context {
-
-        public FieldContext(final Object source, final Object target, final Annotation annotation, final Field field, final FieldAccessorFactory factory) {
-            super(source, target, annotation, new Scope.FieldScope(field, factory.getAccessor(field)), new FieldSupplier(factory));
-
-        }
-    }
-
-    /**
-     * 方法参数上下文
-     */
-    class ParameterContext extends Context {
-        //方法参数
-        protected MethodParameter parameter;
-
-        public ParameterContext(final Object source, final Object target, final Annotation annotation,
-                                final PropertySupplier supplier, final MethodParameter parameter) {
-            super(source, target, annotation, new Scope.ParameterScope(parameter), supplier);
-            this.parameter = parameter;
-        }
-    }
 }

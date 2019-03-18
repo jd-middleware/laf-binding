@@ -12,7 +12,9 @@ public abstract class Primitive {
      * @return
      */
     public static Class<?> inbox(final Class<?> clazz) {
-        if (!clazz.isPrimitive()) {
+        if (clazz == null) {
+            return null;
+        } else if (!clazz.isPrimitive()) {
             return clazz;
         } else if (int.class.equals(clazz)) {
             return Integer.class;
