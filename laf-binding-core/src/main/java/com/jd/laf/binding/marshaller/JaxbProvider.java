@@ -73,6 +73,16 @@ public class JaxbProvider implements XmlProvider {
             javax.xml.bind.Unmarshaller marshaller = context.createUnmarshaller();
             return (T) marshaller.unmarshal(new StringReader(value));
         }
+
+        @Override
+        public <T> T unmarshall(final String value, final TypeReference<T> reference, final String format) throws Exception {
+            return unmarshall(value, (Class<T>) reference.getType());
+        }
+
+        @Override
+        public <T> T unmarshall(final String value, final TypeReference<T> reference) throws Exception {
+            return unmarshall(value, (Class<T>) reference.getType());
+        }
     }
 
 

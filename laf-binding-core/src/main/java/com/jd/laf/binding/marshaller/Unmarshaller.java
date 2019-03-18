@@ -17,9 +17,26 @@ public interface Unmarshaller {
     /**
      * 反序列化
      *
+     * @param format
+     * @return
+     * @throws Exception
+     */
+    <T> T unmarshall(String value, TypeReference<T> reference, String format) throws Exception;
+
+    /**
+     * 反序列化
+     *
      * @return
      * @throws Exception
      */
     <T> T unmarshall(String value, Class<T> clazz) throws Exception;
+
+    /**
+     * 反序列化
+     *
+     * @return
+     * @throws Exception
+     */
+    <T> T unmarshall(String value, TypeReference<T> reference) throws Exception;
 
 }

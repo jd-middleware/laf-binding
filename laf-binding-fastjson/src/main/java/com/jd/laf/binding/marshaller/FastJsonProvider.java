@@ -16,17 +16,30 @@ public class FastJsonProvider implements JsonProvider {
         return FastJsonMarshaller.INSTANCE;
     }
 
+    /**
+     * FastJson实现
+     */
     static class FastJsonUnmarshaller implements Unmarshaller {
         static Unmarshaller INSTANCE = new FastJsonUnmarshaller();
 
         @Override
-        public <T> T unmarshall(String value, Class<T> clazz, String format) throws Exception {
+        public <T> T unmarshall(final String value, final Class<T> clazz, final String format) throws Exception {
             return JSON.parseObject(value, clazz);
         }
 
         @Override
-        public <T> T unmarshall(String value, Class<T> clazz) throws Exception {
-            return unmarshall(value, clazz, null);
+        public <T> T unmarshall(final String value, final Class<T> clazz) throws Exception {
+            return JSON.parseObject(value, clazz);
+        }
+
+        @Override
+        public <T> T unmarshall(final String value, final TypeReference<T> reference, final String format) throws Exception {
+            return JSON.parseObject(value, reference.getType());
+        }
+
+        @Override
+        public <T> T unmarshall(final String value, final TypeReference<T> reference) throws Exception {
+            return JSON.parseObject(value, reference.getType());
         }
     }
 
