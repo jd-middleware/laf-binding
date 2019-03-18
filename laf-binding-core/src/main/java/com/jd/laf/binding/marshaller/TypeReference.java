@@ -38,6 +38,16 @@ public abstract class TypeReference<T> {
         });
     }
 
+    protected TypeReference(final Type rawType, Type[] argTypes) {
+        Type key = new MyParameterizedType(argTypes, this.getClass(), rawType);
+        this.type = computeIfAbsent(classTypeCache, key, new Function<Type, Type>() {
+            @Override
+            public Type apply(Type key) {
+                return key;
+            }
+        });
+    }
+
     protected TypeReference(final Type... actualTypeArguments) {
         Class<?> thisClass = this.getClass();
         Type superClass = thisClass.getGenericSuperclass();
