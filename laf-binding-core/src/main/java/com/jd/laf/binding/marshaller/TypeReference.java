@@ -1,6 +1,7 @@
 package com.jd.laf.binding.marshaller;
 
 import com.jd.laf.binding.reflect.ParameterizedTypeImpl;
+import com.jd.laf.binding.util.Function;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -9,6 +10,8 @@ import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.jd.laf.binding.util.Collections.computeIfAbsent;
 
 /**
  * 来源于fastjson，便于插件实现
@@ -26,22 +29,30 @@ public abstract class TypeReference<T> {
     protected TypeReference() {
         Type superClass = getClass().getGenericSuperclass();
         Type type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
-        this.type = TYPE.putIfAbsent(type, type);
+        this.type = putIfAbsent(type);
     }
 
     protected TypeReference(final Type rawType, Type[] argTypes) {
-        Type key = new ParameterizedTypeImpl(argTypes, this.getClass(), rawType);
-        this.type = TYPE.putIfAbsent(key, key);
+        Type type = new ParameterizedTypeImpl(argTypes, this.getClass(), rawType);
+        this.type = putIfAbsent(type);
     }
 
     protected TypeReference(final Type... actualTypeArguments) {
         Class<?> thisClass = this.getClass();
         Type superClass = thisClass.getGenericSuperclass();
-
         ParameterizedType argType = (ParameterizedType) ((ParameterizedType) superClass).getActualTypeArguments()[0];
 
-        Type key = handle(thisClass, argType, actualTypeArguments, 0);
-        this.type = TYPE.putIfAbsent(key, key);
+        Type type = handle(thisClass, argType, actualTypeArguments, 0);
+        this.type = putIfAbsent(type);
+    }
+
+    protected Type putIfAbsent(final Type type) {
+        return computeIfAbsent(TYPE, type, new Function<Type, Type>() {
+            @Override
+            public Type apply(final Type key) {
+                return key;
+            }
+        });
     }
 
 
