@@ -1,7 +1,5 @@
 package com.jd.laf.binding.marshaller;
 
-import com.jd.laf.binding.reflect.TypeReference;
-
 /**
  * 反序列化
  */

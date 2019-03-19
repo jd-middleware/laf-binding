@@ -1,4 +1,6 @@
-package com.jd.laf.binding.reflect;
+package com.jd.laf.binding.marshaller;
+
+import com.jd.laf.binding.reflect.ParameterizedTypeImpl;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;

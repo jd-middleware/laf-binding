@@ -1,6 +1,5 @@
 package com.jd.laf.binding.marshaller;
 
-import com.jd.laf.binding.reflect.TypeReference;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,7 +1,5 @@
 package com.jd.laf.binding.marshaller;
 
-import com.jd.laf.binding.reflect.TypeReference;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
