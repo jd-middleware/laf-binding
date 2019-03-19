@@ -313,6 +313,8 @@ public class BindingTest {
                 return 10;
             } else if ("param2".equals(name)) {
                 return 20;
+            } else if ("city".equals(name)) {
+                return "beijing,chengdu";
             }
             return null;
         }

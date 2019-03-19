@@ -1,6 +1,7 @@
 package com.jd.laf.binding.marshaller;
 
 import com.alibaba.fastjson.JSON;
+import com.jd.laf.binding.reflect.TypeReference;
 
 /**
  * FastJson提供者
