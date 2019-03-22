@@ -187,9 +187,9 @@ public class GenericClass {
             name = type.toString();
             GenericDeclaration gd = ((TypeVariable) type).getGenericDeclaration();
             if (gd instanceof Class) {
-                result.add(classGeneric.get(owner).get(name));
+                result.add(new GenericMeta(classGeneric.get(owner).get(name), true));
             } else if (gd instanceof Method) {
-                result.add(new GenericMeta(name));
+                result.add(new GenericMeta(name, true));
             }
         }
         return result.toArray(new GenericMeta[result.size()]);

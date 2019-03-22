@@ -10,8 +10,17 @@ public class GenericMeta {
     protected Class scopeType;
     //泛型的类型
     protected Class clazz;
+    //是否是类变量
+    protected boolean typeVariable;
     //用于方法上的泛型，代表了第几个参数类型就是该泛型类型
     protected int classParameter = -1;
+
+    public GenericMeta(GenericMeta meta, boolean typeVariable) {
+        this.name = meta.name;
+        this.clazz = meta.clazz;
+        this.typeVariable = typeVariable;
+        this.scopeType = scopeType;
+    }
 
     public GenericMeta(GenericMeta meta, Class scopeType) {
         this.name = meta.name;
@@ -23,15 +32,25 @@ public class GenericMeta {
         this.name = name;
     }
 
+    public GenericMeta(String name, boolean typeVariable) {
+        this.name = name;
+        this.typeVariable = typeVariable;
+    }
+
     public GenericMeta(String name, Class clazz) {
         this.name = name;
         this.clazz = clazz;
     }
 
     public GenericMeta(String name, Class scopeType, Class clazz) {
+        this(name,scopeType,clazz,false);
+    }
+
+    public GenericMeta(String name, Class scopeType, Class clazz, boolean typeVariable) {
         this.name = name;
         this.scopeType = scopeType;
         this.clazz = clazz;
+        this.typeVariable = typeVariable;
     }
 
     public String getName() {
@@ -44,6 +63,10 @@ public class GenericMeta {
 
     public Class getClazz() {
         return clazz;
+    }
+
+    public boolean isTypeVariable() {
+        return typeVariable;
     }
 
     public int getClassParameter() {

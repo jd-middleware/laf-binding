@@ -26,9 +26,10 @@ public class Java6Parameter implements MethodParameter {
         this.method = method;
         this.index = index;
         this.name = name == null || name.isEmpty() ? "param" + index : name;
-        this.type = type;
+        boolean variable = genericMetas != null && genericMetas.length == 1 && genericMetas[0].isTypeVariable();
+        this.type = variable ? genericMetas[0].getClazz() : type;
         this.annotations = annotations;
-        this.genericMetas = genericMetas;
+        this.genericMetas = variable ? new GenericMeta[0] : genericMetas;
     }
 
     @Override
