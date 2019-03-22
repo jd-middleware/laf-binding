@@ -1,10 +1,12 @@
 package com.jd.laf.binding.marshaller;
 
 import com.alibaba.fastjson.JSON;
+import com.jd.laf.extension.Extension;
 
 /**
  * FastJson提供者
  */
+@Extension(value = "fastjson", provider = "alibaba", order = 100)
 public class FastJsonProvider implements JsonProvider {
     @Override
     public Unmarshaller getUnmarshaller() {
