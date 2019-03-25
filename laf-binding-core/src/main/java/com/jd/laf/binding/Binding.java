@@ -37,7 +37,7 @@ public abstract class Binding {
     protected static ConcurrentMap<Class<?>, List<BindingScope>> FIELDS = new ConcurrentHashMap<Class<?>, List<BindingScope>>();
 
     // 缓存方法的参数绑定关系
-    protected static ConcurrentMap<Method, List<BindingScope>> METHODS = new ConcurrentHashMap<Method, List<BindingScope>>();
+    protected static ConcurrentMap<Class<?>, ConcurrentMap<Method, List<BindingScope>>> METHODS = new ConcurrentHashMap<Class<?>, ConcurrentMap<Method, List<BindingScope>>>();
 
     /**
      * 设置字段值
@@ -239,8 +239,17 @@ public abstract class Binding {
         final MethodFactory methodFactory = METHOD_FACTORY.get();
         Object[] args = new Object[methodFactory.getParameterCount(method)];
 
-        // 从缓存中获取
-        List<BindingScope> bindings = computeIfAbsent(METHODS, method, new Function<Method, List<BindingScope>>() {
+        // 按实际类来缓存方法的绑定对象
+        final Class<?> targetClass = target.getClass();
+        ConcurrentMap<Method, List<BindingScope>> methods = computeIfAbsent(METHODS, targetClass,
+                new Function<Class<?>, ConcurrentMap<Method, List<BindingScope>>>() {
+                    @Override
+                    public ConcurrentMap<Method, List<BindingScope>> apply(final Class<?> key) {
+                        return new ConcurrentHashMap<Method, List<BindingScope>>();
+                    }
+                });
+        //获取该方法的的绑定对象
+        List<BindingScope> bindings = computeIfAbsent(methods, method, new Function<Method, List<BindingScope>>() {
             @Override
             public List<BindingScope> apply(final Method method) {
                 // 没有找到则从注解中查找
@@ -248,7 +257,7 @@ public abstract class Binding {
                 Annotation[] annotations;
                 BindingScope bindingScope;
                 Binder binder;
-                List<MethodParameter> parameters = methodFactory.getParameters(target.getClass(), method);
+                List<MethodParameter> parameters = methodFactory.getParameters(targetClass, method);
                 //遍历字段
                 for (final MethodParameter parameter : parameters) {
                     bindingScope = new BindingScope(new ParameterScope(parameter), supplier);
