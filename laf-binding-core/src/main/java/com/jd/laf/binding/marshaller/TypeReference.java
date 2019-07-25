@@ -17,7 +17,7 @@ import static com.jd.laf.binding.util.Collections.computeIfAbsent;
  * 来源于fastjson，便于插件实现
  *
  * @param <T>
- * @see com.alibaba.fastjson.TypeReference
+ *
  */
 public abstract class TypeReference<T> {
     protected static ConcurrentMap<Type, Type> TYPE = new ConcurrentHashMap<Type, Type>(16, 0.75f, 1);
